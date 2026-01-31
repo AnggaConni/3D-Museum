@@ -617,7 +617,7 @@
             const door = new THREE.Mesh(doorGeo, doorMat); door.position.set(0, 1.25, 2.8); door.rotation.x = -0.2; houseGroup.add(door);
             
             // FIXED: Correct Category Name from Sheet
-            houseGroup.userData = { type: 'category', value: 'ancient_craft', name: 'Ancient Craft Gallery', desc: 'Sumbawa Heritage - ICH' };
+            houseGroup.userData = { type: 'category', value: 'ancient_craft', name: 'Ancient Craft Gallery', desc: 'Ancient Artifact - ICH' };
             scene.add(houseGroup); objectsToIntersect.push(houseGroup); addFloatingAnimation(houseGroup, 1); addBreathingAnimation(houseGroup);
 
             // Museum Model
@@ -867,4 +867,5 @@
 </body>
 
 </html>
+
 
