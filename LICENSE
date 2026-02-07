@@ -1,20 +1,42 @@
-LICENSE AGREEMENT
+CUSTOM LICENSE: SOCIAL GOOD & EDUCATIONAL USE ONLY
+(LISENSI KHUSUS: PENGGUNAAN SOSIAL & EDUKASI)
+
 Copyright (c) 2026 Angga Conni Saputra
 
-PREAMBLE:
-This software is provided to support non-profit and humanitarian initiatives while protecting the creator's commercial rights against government procurement and for-profit exploitation.
+========================================================================
+[ENGLISH]
+This software is developed with the intent to support education, community empowerment, and non-profit governance reform. The "Open Kitchen" philosophy applies here: total transparency for public trust.
 
-1. PERMISSION FOR NGO & NON-PROFIT USE
-Permission is hereby granted, free of charge, to any Non-Governmental Organization (NGO), charity, or non-profit entity to use, copy, and modify this software for non-commercial purposes only.
+1. PERMISSIONS
+You are free to:
+- Read, inspect, and audit the source code (Transparency).
+- Use, copy, and modify the software for PERSONAL, EDUCATIONAL, research, or NON-PROFIT organization use.
+- Distribute copies of the software to help communities or for social impact projects.
 
-2. RESTRICTION ON GOVERNMENT & COMMERCIAL USE
-Usage of this software, in whole or in part, by any Government entity (including but not limited to ministries, agencies, and state-owned enterprises) or for any Government Procurement (Pengadaan Barang/Jasa Pemerintah) is STRICTLY PROHIBITED without a prior written commercial license from the Copyright Holder.
+2. RESTRICTIONS (STRICTLY NON-COMMERCIAL)
+You may NOT:
+- Sell this software or any part of its code.
+- Use this software for commercial purposes, business profit, or bundle it within a paid product without explicit written permission from the author.
+- Close the source code. Any modification distributed for public use must remain Open Source under these same terms.
 
-3. RESTRICTION ON FOR-PROFIT USE
-Usage by for-profit corporations or commercial entities is prohibited without a separate commercial license.
+3. DISCLAIMER
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. THE AUTHOR IS NOT LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY.
 
-4. NO WARRANTY
-The software is provided "as is", without warranty of any kind.
+========================================================================
+[BAHASA INDONESIA]
+Software ini dibuat untuk mendukung pendidikan, pemberdayaan masyarakat, dan reformasi tata kelola non-profit. Filosofi "Dapur Terbuka" berlaku di sini: transparansi total untuk kepercayaan publik.
 
-5. RESERVATION OF RIGHTS
-All rights not expressly granted here are reserved by Angga Conni Saputra.
+1. IZIN PENGGUNAAN (DIPERBOLEHKAN)
+Anda bebas untuk:
+- Membaca, memeriksa, dan mengaudit kode sumber (Demi Transparansi).
+- Menggunakan, menyalin, dan memodifikasi software ini untuk keperluan PRIBADI, PENDIDIKAN (Skripsi/Riset), atau Organisasi NON-PROFIT (LSM/Komunitas).
+- Menyebarkan salinan software ini untuk membantu masyarakat atau proyek sosial.
+
+2. LARANGAN (DILARANG KERAS UNTUK KOMERSIAL)
+Anda DILARANG untuk:
+- Menjual software ini atau bagian manapun dari kodenya.
+- Menggunakan software ini untuk tujuan komersial, keuntungan bisnis, atau memasukannya ke dalam produk berbayar tanpa izin tertulis dari penulis.
+- Menutup kode sumber. Setiap modifikasi yang disebarkan untuk publik harus tetap Open Source (Terbuka).
+
+3. PENYANGKALAN
+SOFTWARE INI DISEDIAKAN "APA ADANYA". PENULIS TIDAK BERTANGGUNG JAWAB ATAS KLAIM ATAU KERUSAKAN APAPUN AKIBAT PENGGUNAAN.
