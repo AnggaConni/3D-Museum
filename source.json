@@ -40,5 +40,16 @@
       "targetSize": 8,
       "note": "Reserved for later; not assigned to one of the three current data categories."
     }
-  ]
+  ],
+  "environment": {
+    "enabled": true,
+    "url": "./amphitheater/amphitheatre.glb",
+    "targetWidth": 120,
+    "rotationY": 0,
+    "position": [
+      0,
+      0,
+      0
+    ]
+  }
 }
