@@ -92,7 +92,8 @@ Keep Google's exact published URL, including `output=csv` when provided.
 - `index.html` loads `source.json` at startup.
 - `source.json` contains the published CSV URL, collection display name, and enabled/disabled GLB model mapping.
 - Three.js `GLTFLoader` loads the selected local `.glb` files; each active category model is scaled to a shared maximum dimension, centered, and placed on its display base.
-- PapaParse maps the sheet's rows into records rendered in the 3D scene.
+- PapaParse parses the published CSV, with a small built-in CSV parser as a fallback if the PapaParse CDN is unavailable.
+- The loader validates CSV headers and expected category values before showing the collection. It tries Google Sheets directly, then two proxy fallbacks, each with a timeout; free public proxies can still be temporarily unavailable.
 - The sheet must be published for browser-based access. **Do not publish passwords, private data, API keys, or confidential records**; published output may be readable by visitors.
 - Google publishing settings, browser CORS restrictions, network connectivity, and third-party service availability may affect loading.
 
@@ -137,7 +138,7 @@ The custom `favicon.svg` is linked from `index.html`. Replace it with your own i
 - **Tailwind CSS CDN:** interface styling.
 - **PapaParse:** CSV parsing.
 - **Google Fonts:** typography.
-- **AllOrigins (fallback):** public third-party proxy attempted if direct browser fetch fails. It is not guaranteed; remove this fallback if you do not want the dependency.
+- **AllOrigins and Codetabs (fallbacks):** public third-party proxies attempted only if the browser cannot fetch the published CSV directly. They are best-effort dependencies, have request timeouts, and are not guaranteed to be available.
 
 Third-party libraries are loaded from public CDNs, so an internet connection is needed.
 
@@ -146,7 +147,9 @@ Third-party libraries are loaded from public CDNs, so an internet connection is 
 - **Configuration error:** validate `source.json` JSON syntax and check that `sheetUrl` contains the full published CSV URL.
 - **No live data:** publish the correct sheet/tab as CSV, and ensure categories match `underwater`, `ancient_craft`, or `museum`.
 - **A 3D model is missing:** check its `url` in `source.json`, confirm the file exists in `models/`, and make sure its `enabled` value is `true` and its `category` matches one of the current categories.
-- **Browser fetch failure:** open the published CSV URL directly to confirm it is accessible. The proxy fallback may help with CORS but is not guaranteed.
+- **Browser fetch failure:** confirm `source.json` uses the published CSV URL (normally ending in `/pub?output=csv`), not the HTML page URL ending in `/pubhtml`. The app now converts `/pubhtml` URLs automatically, but the configured source should still be a published sheet.
+- **Stuck on Connecting:** open the browser DevTools Console. Each retrieval route has a timeout and logs its own failure reason; public proxy services can still experience outages.
+- **PapaParse unavailable:** a built-in CSV parser is used as a fallback. If the source is HTML or the CSV is missing `category` and `title`-type headers, the loader rejects it with a diagnostic instead of pretending it is live data.
 - **Images not shown:** verify the image URL is public. Google Drive images may need public viewing permissions.
 
 ## License and reuse
