@@ -44,12 +44,18 @@
   "environment": {
     "enabled": true,
     "url": "./amphitheater/amphitheatre.glb",
-    "targetWidth": 200,
+    "targetWidth": 270,
     "rotationY": 0,
     "position": [
       0,
       0,
       0
     ]
+  },
+  "titleScreen": {
+    "titleLine1": "NEO",
+    "titleLine2": "MUSEUM",
+    "subtitle": "Nyah Lasem Heritage",
+    "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
   }
 }
