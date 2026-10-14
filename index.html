@@ -228,7 +228,7 @@
                     <div class="bg-slate-900/80 p-4 border-l-4 border-green-500">
                         <h3 class="text-white font-bold text-lg mb-2 flex items-center gap-2"><span class="text-green-400">[CONNECTED]</span> Google Sheets Linkage</h3>
                         <p class="mb-2">Data is pulled live from your published CSV.</p>
-                        <p class="text-xs text-gray-500">Source: ...WwxlLqEupcIWxJ/pub?output=csv</p>
+                        <p class="text-xs text-gray-500">Source: <span id="sheet-source-url">Configured in source.json</span></p>
                     </div>
                 </div>
             </div>
@@ -245,13 +245,49 @@
        console.log("System Architect: Angga Conni Saputra // ID: " + AUTHOR_SIGNATURE_HASH);
         
         // --- CONFIGURATION ---
+        // Change the Google Sheets source in source.json; no HTML editing required.
         const config = {
             itemsPerRoom: 20,
             wallColor: 0x1e293b,
             floorColor: 0x0f172a,
             accentColor: 0x06b6d4,
-            sheetUrl: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vQwKmyadrIerG4AoqamYKVD39UpeA0s0poj0c1bAmGDoR9XfRPEq0SfjEByFZHTx51ywlLqEupcIWxJ/pub?output=csv'
+            sheetUrl: '',
+            sourceName: 'Google Sheets'
         };
+
+        async function loadSourceConfig() {
+            try {
+                const response = await fetch('./source.json', { cache: 'no-store' });
+                if (!response.ok) throw new Error(`source.json returned HTTP ${response.status}`);
+                const sourceConfig = await response.json();
+                const sheetUrl = (sourceConfig.sheetUrl || '').trim();
+                if (!sheetUrl || sheetUrl.includes('PASTE_YOUR') || !/^https:\/\/docs\.google\.com\/spreadsheets\/d\/e\//i.test(sheetUrl)) {
+                    throw new Error('Enter a published Google Sheets CSV URL in source.json.');
+                }
+                config.sheetUrl = sheetUrl;
+                config.sourceName = sourceConfig.sourceName || 'Google Sheets';
+                const sourceLink = document.getElementById('sheet-source-url');
+                if (sourceLink) sourceLink.textContent = config.sourceName + ' (published CSV)';
+                return true;
+            } catch (error) {
+                console.error('[SOURCE CONFIG]', error);
+                const bootStatus = document.getElementById('boot-status');
+                if (bootStatus) bootStatus.textContent = 'Configuration error: check source.json';
+                const connText = document.getElementById('connection-text');
+                if (connText) {
+                    connText.textContent = 'CONFIGURATION ERROR';
+                    connText.classList.replace('text-yellow-300', 'text-red-300');
+                }
+                const connStatus = document.getElementById('connection-status');
+                if (connStatus) connStatus.classList.replace('bg-yellow-500', 'bg-red-500');
+                const btn = document.getElementById('start-btn');
+                if (btn) {
+                    btn.innerText = 'CHECK SOURCE.JSON';
+                    btn.disabled = true;
+                }
+                return false;
+            }
+        }
 
         let state = {
             scene: 'TITLE', 
@@ -479,7 +515,9 @@
             mouse = new THREE.Vector2();
 
             setupLights();
-            loadGoogleSheetData(); 
+            loadSourceConfig().then(configured => {
+                if (configured) loadGoogleSheetData();
+            }); 
 
             window.addEventListener('resize', onWindowResize);
             window.addEventListener('mousemove', onMouseMove);
