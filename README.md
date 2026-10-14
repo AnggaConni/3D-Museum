@@ -1,95 +1,112 @@
 # 3D Museum
 
-A browser-based 3D exhibition that reads collection metadata from a Google Sheets CSV published to the web. Built with Three.js and designed to be adapted by museums, schools, community groups, and heritage projects.
+![License: GPL-3.0-only](https://img.shields.io/badge/License-GPL--3.0-only-blue.svg)
+![Static site](https://img.shields.io/badge/hosting-GitHub%20Pages%20ready-2f855a.svg)
+![No backend](https://img.shields.io/badge/backend-none-64748b.svg)
 
-**The Google Sheets URL and 3D category models are configured in `source.json`**, so users can change the data source or swap model files without editing application code.
+**A free, open-source 3D catalogue template that anyone can publish.** Build a digital museum, craft catalogue, heritage collection, classroom showcase, or personal collection with a simple Google Sheets CSV backend and a customizable Three.js frontend.
+
+No application server or database is required for the static version. The collection is driven by `source.json`, and the 3D models, environment, and opening theme are configurable.
+
+<p align="center">
+  <a href="https://anggaconni.github.io/3D-Museum/editor.html">
+    <img src="https://img.shields.io/badge/OPEN%20THE%20JSON%20EDITOR-Configure%20%26%20export%20source.json-D9B56D?style=for-the-badge&labelColor=101A20" alt="Open the 3D Museum JSON Editor">
+  </a>
+</p>
+
+<p align="center"><strong>Are you having trouble editing JSON?</strong><br>Use the visual editor instead: change the fields, validate the configuration, export <code>source.json</code>, and replace the file in your own repository. The editor does not publish changes automatically and does not need a GitHub token.</p>
+
+## Start here: use the template
+
+You can make an independent copy of this project without forking the original repository.
+
+1. Open the [3D-Museum repository](https://github.com/AnggaConni/3D-Museum).
+2. Click the green **Use this template** button near the top-right of the repository page.
+3. Choose **Create a new repository** from the menu.
+4. Select your GitHub account or organization as the owner. Enter your new repository name, for example `my-community-museum`, and choose Public or Private visibility as appropriate.
+5. Click **Create repository from template**. GitHub creates a new repository containing the template files. This is a separate repository, not a fork that automatically receives upstream changes.
+6. In your new repository, customize `source.json` using the editor below. Replace the demo Google Sheets URL with your own published CSV URL before sharing your catalogue.
+7. Open **Settings → Pages**. Under **Build and deployment**, choose **Deploy from a branch**, select branch `main` and folder `/(root)`, then click **Save**. If your default branch has a different name, select that branch instead.
+8. Wait for GitHub Pages to finish deploying. Visit the Pages URL shown in **Settings → Pages**. Your editor will usually be available at `https://YOUR-USERNAME.github.io/YOUR-REPOSITORY/editor.html`.
+
+> **Important:** after using the template, the copied `source.json` may still point to the sample collection. Update the sheet URL and verify the model/image asset rights before publishing your own version.
 
 ## Visual setup guide
 
-Follow the illustrated guide below to publish your Google Sheet as a CSV and connect it to the museum. The full image is available as [HOWTO.png](HOWTO.png).
+Follow the illustrated guide to publish a Google Sheet as CSV and connect it to the museum. The full image is available as [HOWTO.png](HOWTO.png).
 
-![Step-by-step tutorial: Publish a Google Sheet as CSV and configure source.json](HOWTO.png)
+![Step-by-step tutorial: publish a Google Sheet as CSV and configure source.json](HOWTO.png)
 
+## The easiest way to configure it: JSON Editor
 
-## Quick setup / Cara menggunakan
+**Open the [3D Museum JSON Editor](https://anggaconni.github.io/3D-Museum/editor.html).**
 
-1. **Fork or copy this repository** and publish it using GitHub Pages (or another static web host).
-2. Create a Google Sheet with column headers in the first row:
+1. When the editor is hosted on GitHub Pages, click **Load site config** to load that repository's current `source.json`. You can also click **Import JSON** and select a local `source.json` file.
+2. Edit the collection name and published Google Sheets URL.
+3. Choose a title theme: `egyptian_tomb`, `ich_crafting`, or `neo_museum`. You can edit the title, subtitle, and footer text for the selected preset.
+4. Configure model paths, enabled/disabled status, target size, and the surrounding GLB environment.
+5. Review the generated JSON and its validation notes. Click **Download source.json** or **Copy JSON**.
+6. In your own repository, open `source.json`, click the pencil **Edit** button, replace the entire contents with the exported JSON, and click **Commit changes**.
+7. Wait for GitHub Pages to redeploy, then refresh the site.
 
-   | Column | Required? | Example |
-   |---|---|---|
-   | `id` | Recommended | `001` |
-   | `title` | Yes | `Traditional Fishing Boat` |
-   | `description` | Optional | `A traditional wooden boat...` |
-   | `category` | Yes | `museum`, `underwater`, or `ancient_craft` |
-   | `image_url` | Optional | Public image URL or Google Drive share URL |
-   | `year` | Optional | `1950` |
+The editor runs in the browser. It has no backend, does not require a sign-in, does not ask for a GitHub token, and never commits changes on your behalf. You can also download `editor.html` and use **Import JSON** if the editor cannot automatically fetch a same-folder `source.json` file.
 
-   Aliases such as `nama`, `judul`, `kategori`, `gambar`, `deskripsi`, and `tahun` are also supported.
-3. In Google Sheets, choose **File → Share → Publish to web**. Select the relevant sheet/tab and **Comma-separated values (.csv)**, publish it, then copy the published CSV URL. Merely sharing a sheet with “Anyone with the link” is not the same as publishing it to the web.
-4. Open `source.json` and replace the `sheetUrl` placeholder with the full URL from Google. **You do not need to edit `index.html`.**
-5. Commit the change and open the published website. The app reads `source.json` at startup.
+## Manual setup
 
-Example `source.json`:
+If you prefer to edit configuration by hand, open `source.json` and update the relevant fields. You do **not** need to edit `index.html` for normal source, theme, model-path, or environment adjustments.
+
+### Google Sheets data source
+
+Create a Google Sheet with headers in the first row:
+
+| Column | Required? | Example |
+|---|---|---|
+| `id` | Recommended | `001` |
+| `title` | Yes | `Traditional Fishing Boat` |
+| `description` | Optional | `A traditional wooden boat...` |
+| `category` | Yes | `museum`, `underwater`, or `ancient_craft` |
+| `image_url` | Optional | A publicly accessible image URL |
+| `year` | Optional | `1950` |
+
+Aliases such as `nama`, `judul`, `kategori`, `gambar`, `deskripsi`, and `tahun` are also supported.
+
+In Google Sheets, choose **File → Share → Publish to web**. Select the relevant sheet/tab and **Comma-separated values (.csv)**, publish it, and copy the published CSV URL. Merely sharing the sheet with “Anyone with the link” is not the same as publishing it to the web.
+
+Example:
 
 ```json
 {
-  "_instructions": "Copy your Google Sheets Publish to web CSV URL into sheetUrl. Keep this file beside index.html.",
   "sourceName": "My Museum Collection",
-  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID/pub?output=csv",
-  "models": [
-    {
-      "id": "shipwreck",
-      "category": "underwater",
-      "enabled": true,
-      "url": "./models/shipwreck.glb",
-      "targetSize": 8
-    },
-    {
-      "id": "african-hut",
-      "category": "ancient_craft",
-      "enabled": true,
-      "url": "./models/african%20hut.glb",
-      "targetSize": 8
-    },
-    {
-      "id": "museum",
-      "category": "museum",
-      "enabled": true,
-      "url": "./models/museum.glb",
-      "targetSize": 8
-    },
-    {
-      "id": "artifact",
-      "category": null,
-      "enabled": false,
-      "url": "./models/artifact.glb",
-      "targetSize": 8
-    },
-    {
-      "id": "statue",
-      "category": null,
-      "enabled": false,
-      "url": "./models/statue.glb",
-      "targetSize": 8
-    }
-  ]
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID/pub?output=csv"
 }
 ```
 
-Keep Google's exact published URL, including `output=csv` when provided.
+Keep Google's published URL. The application converts common `/pubhtml` URLs to a CSV endpoint where possible, but a true published CSV URL is preferred.
 
-### 3D model configuration
+> **Public-data warning:** published sheet content can be read by visitors. Never place passwords, private personal details, API keys, or confidential records in a sheet published to the web.
 
-- The three active models match the existing Google Sheets categories: `underwater`, `ancient_craft`, and `museum`.
-- `targetSize: 8` normalizes each model to the same largest bounding-box dimension while preserving its original proportions. The model is centered and placed on the category platform.
-- `enabled: false` disables a configured model. The `artifact.glb` and `statue.glb` files are included as inactive extras because they are not assigned to one of the three current categories.
-- Put replacement `.glb` files in the `models/` folder and change only the matching `url` in `source.json`. Use URL-encoded spaces, such as `african%20hut.glb`, for filenames containing spaces.
-- Large GLB files may take longer to load on mobile connections. Optimize/compress them before adding substantially larger assets.
+### Theme presets
 
-### 3D environment configuration
+Set `theme.active` to one of the keys below. The preset also stores its title and subtitle text.
 
-The generated city skyline has been replaced by a configurable GLB environment, currently `amphitheater/amphitheatre.glb`. The scene uses a bright blue sky, warm late-afternoon directional light, hemispheric fill light, and the environment's own floor to avoid overlapping the old grid plane. Change the `environment` object in `source.json` to disable or replace it:
+- `egyptian_tomb` — bright limestone/papyrus, antique gold and lapis-blue accents.
+- `ich_crafting` — light cotton-paper palette, woven geometry, botanical green and terracotta accents.
+- `neo_museum` — the original dark cyberpunk grid and neon-cyan style.
+
+For example, changing `"active": "egyptian_tomb"` to `"active": "ich_crafting"` selects the ICH crafting title screen.
+
+### 3D category models
+
+Models are listed under `models` in `source.json`. Each entry supports `id`, `category`, `enabled`, `url`, and `targetSize`.
+
+- `targetSize: 8` scales the model to a shared maximum bounding-box dimension while keeping its proportions.
+- Set `enabled: false` to disable a configured model without deleting its entry.
+- Use paths such as `./models/shipwreck.glb`. For filenames containing spaces, URL-encode them, for example `./models/african%20hut.glb`.
+- The current 3D map has three configured scene slots: `underwater`, `ancient_craft`, and `museum`. Adding a new model entry alone will not create a new visible category; adding a new category requires a matching scene slot in `index.html`.
+
+### 3D environment
+
+The surrounding environment is configured separately from category models:
 
 ```json
 "environment": {
@@ -101,125 +118,52 @@ The generated city skyline has been replaced by a configurable GLB environment, 
 }
 ```
 
-- `targetWidth` controls the environment's horizontal footprint in Three.js scene units; proportions are preserved.
-- `rotationY` rotates the model around its vertical axis, in degrees.
-- `position` is an optional `[x, y, z]` offset after the model is centered and aligned to ground level.
-- Set `enabled` to `false` to hide the environment model.
-- The background environment is excluded from hover/click raycasting so internal names inside the GLB cannot override the three category tooltips.
-
-### Theme presets
-
-Choose the opening-screen theme in `source.json` by changing only the `theme.active` value. The three built-in presets are:
-
-- `egyptian_tomb` — default: bright limestone/papyrus background, antique gold and lapis-blue details.
-- `ich_crafting` — bright cotton-paper palette with woven geometric motifs, botanical green and terracotta accents.
-- `neo_museum` — original dark cyberpunk grid with neon cyan.
-
-Example:
-
-```json
-"theme": {
-  "active": "egyptian_tomb",
-  "presets": {
-    "neo_museum": {
-      "label": "NEO Museum",
-      "style": "neo_museum",
-      "titleLine1": "NEO",
-      "titleLine2": "MUSEUM",
-      "subtitle": "Nyah Lasem Heritage",
-      "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
-    },
-    "egyptian_tomb": {
-      "label": "Egyptian Tomb",
-      "style": "egyptian_tomb",
-      "titleLine1": "EGYPTIAN",
-      "titleLine2": "ARTIFACTS",
-      "subtitle": "Tomb of Ancient Treasures",
-      "footerText": "A JOURNEY INTO ANCIENT EGYPT"
-    },
-    "ich_crafting": {
-      "label": "ICH Crafting",
-      "style": "ich_crafting",
-      "titleLine1": "LIVING",
-      "titleLine2": "CRAFTS",
-      "subtitle": "Intangible Cultural Heritage",
-      "footerText": "TRADITION • KNOWLEDGE • COMMUNITY"
-    }
-  }
-}
-```
-
-Change `"active": "egyptian_tomb"` to `"active": "ich_crafting"` or `"active": "neo_museum"` to test another look. The title text is inserted as plain text, not HTML. Earlier `titleScreen`-only configuration is still supported as a fallback for older copies.
+- `targetWidth` sets the horizontal footprint in Three.js scene units while preserving proportions.
+- `rotationY` rotates around the vertical axis in degrees.
+- `position` provides an optional `[x, y, z]` offset.
+- Set `enabled` to `false` to disable the environment model.
 
 ## How it works
 
 - `index.html` loads `source.json` at startup.
-- `source.json` contains the published CSV URL, collection display name, and enabled/disabled GLB model mapping.
-- Three.js `GLTFLoader` loads the selected local `.glb` files; each active category model is scaled to a shared maximum dimension, centered, and placed on its display base.
-- PapaParse parses the published CSV, with a small built-in CSV parser as a fallback if the PapaParse CDN is unavailable.
-- The loader validates CSV headers and expected category values before showing the collection. It tries Google Sheets directly, then two proxy fallbacks, each with a timeout; free public proxies can still be temporarily unavailable.
-- The sheet must be published for browser-based access. **Do not publish passwords, private data, API keys, or confidential records**; published output may be readable by visitors.
-- Google publishing settings, browser CORS restrictions, network connectivity, and third-party service availability may affect loading.
+- Google Sheets Publish to web serves catalogue rows as CSV.
+- PapaParse parses the CSV, with a small built-in parser as a fallback if the PapaParse CDN is unavailable.
+- The loader validates headers and expected categories, attempts the published CSV directly, then tries best-effort proxy fallbacks with timeouts.
+- Three.js and GLTFLoader render local GLB models. GSAP powers animations; OrbitControls provides camera movement.
+- GitHub Pages hosts the static site. No server-side application or database is needed for this setup.
 
-## Want your own domain?
+## Technologies and third-party services
 
-You can keep using the free `https://YOUR-USERNAME.github.io/3D-Museum/` address. **Buying a personal domain is optional**—it is useful if you want a shorter, branded address such as `museum.example.com`.
-
-### Quick guide: Porkbun domain + GitHub Pages
-
-1. **Publish the website on GitHub Pages first.** Put the project files in your repository's root folder, including `index.html`, `source.json`, `favicon.svg`, and `HOWTO.png`. Open **Settings → Pages**, choose **Deploy from a branch**, select the `main` branch and `/(root)`, then save. Wait until GitHub provides your Pages URL.
-2. **Buy a domain (optional).** Visit [Porkbun](https://porkbun.com/), search for a domain name, choose an available one, and complete checkout. You need the domain registration; you do not need to buy a separate hosting package for this static site because GitHub Pages serves the website.
-3. **Add your custom domain in GitHub first.** In the repository, open **Settings → Pages**. Under **Custom domain**, enter the domain you plan to use, such as `www.example.com` or `example.com`, and click **Save**.
-4. **Configure DNS at Porkbun.** Open the domain's DNS management and add the appropriate records. For a `www` subdomain, add a `CNAME` record with host `www` pointing to `YOUR-USERNAME.github.io` (do not include the repository path). For a root/apex domain such as `example.com`, add the four GitHub Pages `A` records below with host `@`:
-
-   ```text
-   185.199.108.153
-   185.199.109.153
-   185.199.110.153
-   185.199.111.153
-   ```
-
-   Remove conflicting default records for the same host if present. DNS changes can take up to 24 hours to propagate. GitHub's official guide covers the current record types and optional IPv6 records: [Managing a custom domain for GitHub Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site/managing-a-custom-domain-for-your-github-pages-site).
-5. **Check HTTPS.** Return to **Settings → Pages** after DNS has propagated. Once GitHub finishes checking the domain, enable **Enforce HTTPS** when the option becomes available.
-
-For a detailed, illustrated walkthrough, see Angga's article: [The Ultimate Zero-Cost Web Architecture: Connecting a Porkbun Domain to GitHub Pages](https://horizon-scanning.org/blog/article/the-ultimate-zero-cost-web-architecture-connecting-a-porkbun-domain-to-github-pages.html).
-
-> **Tip:** You can do all the steps for hosting this museum without buying a domain. Start with the free GitHub Pages address, and connect a custom domain later whenever you want a personal web address.
-
-## Branding, metadata, and favicon
-
-The page includes general SEO and social-sharing metadata: page title and description, Open Graph tags, Twitter/X card tags, theme color, language, and browser referrer policy. When adapting this repository, update the title, description, and author in the `<head>` of `index.html` to match your project.
-
-The custom `favicon.svg` is linked from `index.html`. Replace it with your own icon if you rebrand the museum. For social preview images, add an absolute, publicly accessible image URL using `og:image` and `twitter:image`; avoid hard-coding a canonical URL until you know the final website address.
-
-## Technologies and free tiers
-
-- **Google Sheets Publish to web (CSV):** simple data source under Google's standard service limits.
-- **Three.js:** 3D scene and rendering.
+- **Three.js / GLTFLoader:** 3D rendering and GLB model loading.
 - **OrbitControls:** camera interaction.
-- **GLTFLoader:** loads the local `.glb` category models.
 - **GSAP:** animation.
-- **Tailwind CSS CDN:** interface styling.
-- **PapaParse:** CSV parsing.
+- **PapaParse:** CSV parsing, with a built-in fallback parser.
+- **Tailwind CSS CDN:** interface utilities.
 - **Google Fonts:** typography.
-- **AllOrigins and Codetabs (fallbacks):** public third-party proxies attempted only if the browser cannot fetch the published CSV directly. They are best-effort dependencies, have request timeouts, and are not guaranteed to be available.
+- **Google Sheets Publish to web:** collection data source.
+- **AllOrigins and Codetabs:** optional public proxy fallbacks if direct browser CSV access fails. These are community services and may be unavailable or rate-limited.
 
-Third-party libraries are loaded from public CDNs, so an internet connection is needed.
+An internet connection is needed for the hosted data, public CDNs, and proxy fallbacks.
 
 ## Troubleshooting
 
-- **Configuration error:** validate `source.json` JSON syntax and check that `sheetUrl` contains the full published CSV URL.
-- **No live data:** publish the correct sheet/tab as CSV, and ensure categories match `underwater`, `ancient_craft`, or `museum`.
-- **A category tooltip shows a strange model-part name:** the app now resolves hover/clicks to the parent category group, rather than using internal names from GLB meshes.
-- **The amphitheatre background does not appear:** verify `environment.url` in `source.json` and confirm `amphitheater/amphitheatre.glb` exists in the repository. Check the browser Console for `[ENVIRONMENT]` messages.
-- **A 3D category model is missing:** check its `url` in `source.json`, confirm the file exists in `models/`, and make sure its `enabled` value is `true` and its `category` matches one of the current categories.
-- **Browser fetch failure:** confirm `source.json` uses the published CSV URL (normally ending in `/pub?output=csv`), not the HTML page URL ending in `/pubhtml`. The app now converts `/pubhtml` URLs automatically, but the configured source should still be a published sheet.
-- **Stuck on Connecting:** open the browser DevTools Console. Each retrieval route has a timeout and logs its own failure reason; public proxy services can still experience outages.
-- **PapaParse unavailable:** a built-in CSV parser is used as a fallback. If the source is HTML or the CSV is missing `category` and `title`-type headers, the loader rejects it with a diagnostic instead of pretending it is live data.
-- **Images not shown:** verify the image URL is public. Google Drive images may need public viewing permissions.
+- **Stuck on Connecting:** check the browser DevTools Console for the failed data-source attempts. Public proxy services are not guaranteed to be available.
+- **No live records:** check that the sheet/tab is published as CSV and that its header contains a `title`-type column and a `category`-type column.
+- **A model does not load:** verify its path in `source.json`, check filename spelling and capitalization, and confirm the file exists in the repository.
+- **An extra model does not appear:** the current scene supports only the three categories documented above. A new category needs a corresponding scene implementation in `index.html`.
+- **An image is missing:** check the image URL and confirm that the image is publicly accessible.
+- **The editor did not load the site's JSON:** click **Import JSON** and choose `source.json` from your computer. This is also the workaround when opening the editor directly as a local file.
 
-## License and reuse
+## Custom domain (optional)
 
-See [LICENSE](LICENSE). Retain attribution and check the license before redistribution or commercial use.
+The free GitHub Pages address is enough to get started. Buying a domain is optional.
 
-Built by Angga Conni Saputra.
+For a Porkbun domain setup guide, see [The Ultimate Zero-Cost Web Architecture: Connecting a Porkbun Domain to GitHub Pages](https://horizon-scanning.org/blog/article/the-ultimate-zero-cost-web-architecture-connecting-a-porkbun-domain-to-github-pages.html). You can also follow GitHub's [official custom-domain guide](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site).
+
+## License and asset rights
+
+The **application source code** is licensed under the [GNU General Public License v3.0 only (GPL-3.0-only)](LICENSE). You may use, study, modify, and redistribute the covered code under that license's terms. When you distribute covered modified versions, comply with GPLv3's source and notice requirements.
+
+**Third-party assets are separate.** The GLB files, photos, icons, fonts, and other imported content may have different licenses or creator requirements. Check each asset's own license and keep the required attribution. The software license does not automatically grant relicensing rights for assets that the project does not own.
+
+Issues and improvements are welcome. Built by Angga Conni Saputra.
