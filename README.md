@@ -57,6 +57,25 @@ Create a Google Sheet and keep the column headers in the first row. The core fie
 
 Aliases such as <code>nama</code>, <code>judul</code>, <code>kategori</code>, <code>gambar</code>, <code>deskripsi</code>, and <code>tahun</code> are also supported.
 
+### Try the rich-content sample dataset
+
+Want to test the image carousel and long HTML descriptions before changing your own collection? Download the [sample collection CSV](sample-collection-rich-demo.csv) with 18 example artefacts.
+
+Every example row has **three image links** and a long description containing paragraphs, bold labels, a table, a list, and a reference link. This is designed to demonstrate the new catalogue features.
+
+> **Sample data notice:** these are demonstration descriptions, not verified archaeological records. The extra/detail images are placeholders; the file includes a few existing example image links from the supplied data. Replace placeholders and verify historical claims, image credits, and licences before publishing a real collection.
+
+#### Import the CSV into Google Sheets
+
+1. Download [sample-collection-rich-demo.csv](sample-collection-rich-demo.csv) to your computer.
+2. Open [Google Sheets](https://sheets.google.com/) and create a blank spreadsheet.
+3. In the spreadsheet, choose **File → Import → Upload**, then select the CSV file.
+4. Choose **Replace spreadsheet** for a new test sheet, or **Insert new sheet(s)** if you want to keep your existing tabs. Confirm the import.
+5. Open **File → Share → Publish to web**. Select the sheet/tab you just imported and choose **Comma-separated values (.csv)**, then click **Publish**.
+6. Copy the published CSV URL and put it into the editor's **Published Google Sheets CSV URL** field. Export `source.json` and replace the file in your own repository.
+
+Google Sheets stores the HTML as text in the `description` cell; the museum renders the allowed formatting when visitors open an artefact.
+
 ### Add more than one image
 
 The easiest option is an <code>image_urls</code> column. Paste public image links in one cell and separate them with a vertical bar (<code>|</code>), like this:
