@@ -4,6 +4,13 @@ A browser-based 3D exhibition that reads collection metadata from a Google Sheet
 
 **The Google Sheets URL is configured in `source.json`**, so users can change their data source without editing application code.
 
+## Visual setup guide
+
+Follow the illustrated guide below to publish your Google Sheet as a CSV and connect it to the museum. The full image is available as [HOWTO.png](HOWTO.png).
+
+![Step-by-step tutorial: Publish a Google Sheet as CSV and configure source.json](HOWTO.png)
+
+
 ## Quick setup / Cara menggunakan
 
 1. **Fork or copy this repository** and publish it using GitHub Pages (or another static web host).
@@ -42,6 +49,12 @@ Keep Google's exact published URL, including `output=csv` when provided.
 - PapaParse maps the sheet's rows into records rendered in the 3D scene.
 - The sheet must be published for browser-based access. **Do not publish passwords, private data, API keys, or confidential records**; published output may be readable by visitors.
 - Google publishing settings, browser CORS restrictions, network connectivity, and third-party service availability may affect loading.
+
+## Branding, metadata, and favicon
+
+The page includes general SEO and social-sharing metadata: page title and description, Open Graph tags, Twitter/X card tags, theme color, language, and browser referrer policy. When adapting this repository, update the title, description, and author in the `<head>` of `index.html` to match your project.
+
+The custom `favicon.svg` is linked from `index.html`. Replace it with your own icon if you rebrand the museum. For social preview images, add an absolute, publicly accessible image URL using `og:image` and `twitter:image`; avoid hard-coding a canonical URL until you know the final website address.
 
 ## Technologies and free tiers
 
