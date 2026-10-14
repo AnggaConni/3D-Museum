@@ -1,59 +1,70 @@
-# 3D-Museum
+# 3D Museum
 
-> **Open Source Tools for Community & Governance Reform**
-> *Built by Angga Conni Saputra*
+A browser-based 3D exhibition that reads collection metadata from a Google Sheets CSV published to the web. Built with Three.js and designed to be adapted by museums, schools, community groups, and heritage projects.
 
----
+**The Google Sheets URL is configured in `source.json`**, so users can change their data source without editing application code.
 
-## 🇬🇧 About This Project
-This application allows users to [Jelaskan fungsi singkat dalam B.Inggris]. 
-Built with the **"Open Kitchen"** philosophy, this project ensures zero "black-boxes." Everything is transparent, auditable, and ready for community collaboration.
+## Quick setup / Cara menggunakan
 
-## 🇮🇩 Tentang Project Ini
-Aplikasi ini dibuat untuk memudahkan [Jelaskan fungsi singkat dalam B.Indonesia].
-Dibangun dengan prinsip **"Dapur Terbuka"**. Tidak ada kode yang disembunyikan. Semuanya transparan agar bisa diaudit, dipelajari, dan dikembangkan bersama.
+1. **Fork or copy this repository** and publish it using GitHub Pages (or another static web host).
+2. Create a Google Sheet with column headers in the first row:
 
----
+   | Column | Required? | Example |
+   |---|---|---|
+   | `id` | Recommended | `001` |
+   | `title` | Yes | `Traditional Fishing Boat` |
+   | `description` | Optional | `A traditional wooden boat...` |
+   | `category` | Yes | `museum`, `underwater`, or `ancient_craft` |
+   | `image_url` | Optional | Public image URL or Google Drive share URL |
+   | `year` | Optional | `1950` |
 
-## 🛡️ Security & Integrity (Why Open Source?) / Keamanan & Integritas
+   Aliases such as `nama`, `judul`, `kategori`, `gambar`, `deskripsi`, and `tahun` are also supported.
+3. In Google Sheets, choose **File → Share → Publish to web**. Select the relevant sheet/tab and **Comma-separated values (.csv)**, publish it, then copy the published CSV URL. Merely sharing a sheet with “Anyone with the link” is not the same as publishing it to the web.
+4. Open `source.json` and replace the `sheetUrl` placeholder with the full URL from Google. **You do not need to edit `index.html`.**
+5. Commit the change and open the published website. The app reads `source.json` at startup.
 
-### 🇬🇧 Is it Safe? Yes.
-There is a misconception that web apps might contain ransomware. **Here, you can verify it yourself.**
-* **Auditable:** The code runs on the server (Google Apps Script/Web) or browser. You can inspect every `.gs`, `.html`, or `.js` file directly.
-* **No Hidden Scripts:** There are NO `.exe` files or hidden encryption scripts. What you see is exactly what runs.
-* **Safe to Use:** Designed to help, not to harm. Please check the source code before using.
+Example `source.json`:
 
-### 🇮🇩 Apakah Aman? Ya, Sangat Aman.
-Ada kesalahpahaman bahwa aplikasi web bisa berisi *ransomware*. **Di sini, Anda bisa membuktikannya sendiri.**
-* **Bisa Diaudit:** Kode ini berjalan di server atau browser. Anda bisa melihat file `.gs`, `.html`, atau `.js` secara telanjang mata.
-* **Tidak Ada Script Tersembunyi:** TIDAK ADA file `.exe` (aplikasi eksekusi) atau skrip enkripsi data (ransomware). Apa yang Anda lihat di kode, itulah yang dijalankan sistem.
-* **Aman Digunakan:** Aplikasi ini dirancang untuk membantu, bukan merusak. Silakan bedah kodenya sebelum menggunakan.
+```json
+{
+  "_instructions": "Copy your Google Sheets Publish to web CSV URL into sheetUrl. Keep this file beside index.html.",
+  "sourceName": "My Museum Collection",
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID/pub?output=csv"
+}
+```
 
----
+Keep Google's exact published URL, including `output=csv` when provided.
 
-## 🤝 Who Can Use This? / Siapa yang Boleh Pakai?
+## How it works
 
-I dedicate this code for **Social Impact & Education**.
-Saya mendedikasikan kode ini untuk **Dampak Sosial & Edukasi**.
+- `index.html` loads `source.json` at startup.
+- `source.json` contains the published CSV URL and collection display name.
+- PapaParse maps the sheet's rows into records rendered in the 3D scene.
+- The sheet must be published for browser-based access. **Do not publish passwords, private data, API keys, or confidential records**; published output may be readable by visitors.
+- Google publishing settings, browser CORS restrictions, network connectivity, and third-party service availability may affect loading.
 
-✅ **PERMITTED / DIPERBOLEHKAN:**
-* **Students/Researchers:** Free to clone/fork for learning, thesis, or research. *(Mahasiswa/Pelajar: Gratis untuk belajar/skripsi)*.
-* **NGOs/Communities:** Free to use for community empowerment. *(LSM/Komunitas: Gratis untuk pemberdayaan masyarakat)*.
-* **Public Sector:** Free to adopt for governance transparency. *(Pemerintah/Desa: Gratis untuk transparansi layanan)*.
+## Technologies and free tiers
 
-❌ **PROHIBITED / DILARANG:**
-* **Commercial Use:** Do NOT sell this software or use it for business profit without permission. *(Dilarang menjual atau mencari keuntungan bisnis dari kode ini tanpa izin)*.
-* **Re-branding without Credit:** Please respect intellectual property. *(Mohon hargai karya intelektual dengan mencantumkan sumber)*.
+- **Google Sheets Publish to web (CSV):** simple data source under Google's standard service limits.
+- **Three.js:** 3D scene and rendering.
+- **OrbitControls:** camera interaction.
+- **GSAP:** animation.
+- **Tailwind CSS CDN:** interface styling.
+- **PapaParse:** CSV parsing.
+- **Google Fonts:** typography.
+- **AllOrigins (fallback):** public third-party proxy attempted if direct browser fetch fails. It is not guaranteed; remove this fallback if you do not want the dependency.
 
-> *"If you want to make money from this code, let's talk first. If you want to help people with this code, go ahead."*
+Third-party libraries are loaded from public CDNs, so an internet connection is needed.
 
----
+## Troubleshooting
 
-## 📬 Contact / Kontak
-For bug reports, feature requests, or commercial licensing inquiries:
-*(Untuk laporan bug, saran, atau izin komersial)*:
+- **Configuration error:** validate `source.json` JSON syntax and check that `sheetUrl` contains the full published CSV URL.
+- **No live data:** publish the correct sheet/tab as CSV, and ensure categories match `underwater`, `ancient_craft`, or `museum`.
+- **Browser fetch failure:** open the published CSV URL directly to confirm it is accessible. The proxy fallback may help with CORS but is not guaranteed.
+- **Images not shown:** verify the image URL is public. Google Drive images may need public viewing permissions.
 
-**Angga Conni Saputra**
-*Governance Reform & Digital System Consultant*
+## License and reuse
 
-https://www.linkedin.com/in/anggaconni/
+See [LICENSE](LICENSE). Retain attribution and check the license before redistribution or commercial use.
+
+Built by Angga Conni Saputra.
