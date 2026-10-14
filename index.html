@@ -115,6 +115,181 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #0891b2; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #22d3ee; }
+
+        /* --- CONFIGURABLE TITLE SCREEN THEMES --- */
+        #title-screen .title-pattern {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+            opacity: 0.2;
+            background-image: linear-gradient(#0ff 1px, transparent 1px), linear-gradient(90deg, #0ff 1px, transparent 1px);
+            background-size: 50px 50px;
+            perspective: 1000px;
+            transform: rotateX(60deg) scale(2);
+            transform-origin: center top;
+        }
+        #title-card {
+            width: min(90vw, 760px);
+            transition: background 300ms ease, border-color 300ms ease, box-shadow 300ms ease;
+        }
+        #title-screen .title-corner {
+            border-color: #22d3ee;
+            transition: border-color 300ms ease;
+        }
+        #title-screen #title-subtitle {
+            transition: color 300ms ease;
+        }
+        #title-screen #title-footer {
+            transition: color 300ms ease, border-color 300ms ease;
+        }
+
+        /* Original NEO Museum: dark cyberpunk, neon cyan grid. */
+        #title-screen[data-theme="neo_museum"] {
+            background: radial-gradient(ellipse at center, #071a2a 0%, #020617 68%) !important;
+        }
+        #title-screen[data-theme="neo_museum"] #title-card {
+            background: rgba(0, 0, 0, 0.82) !important;
+            border-color: rgba(6, 182, 212, 0.34) !important;
+            box-shadow: 0 0 42px rgba(6, 182, 212, 0.08);
+        }
+
+        /* Egyptian Tomb: bright limestone, papyrus, lapis blue, and antique gold. */
+        #title-screen[data-theme="egyptian_tomb"] {
+            color: #3b2b18;
+            background: radial-gradient(ellipse at 50% 25%, #fff7df 0%, #f0dfb6 47%, #cda45f 100%) !important;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .title-pattern {
+            opacity: 0.65;
+            background-image:
+                repeating-linear-gradient(0deg, transparent 0 33px, rgba(143, 99, 31, 0.2) 33px 35px),
+                repeating-linear-gradient(90deg, transparent 0 55px, rgba(143, 99, 31, 0.18) 55px 57px),
+                repeating-linear-gradient(45deg, transparent 0 42px, rgba(29, 91, 116, 0.08) 42px 44px);
+            background-size: 88px 88px, 88px 88px, 64px 64px;
+            transform: none;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .cable-decor {
+            background: linear-gradient(90deg, #8d5d20, #e0b95d, #fff0bc, #bd8a32);
+            border-color: #a77729;
+            opacity: 0.7;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .cable-v {
+            border-right-color: #1b7187;
+        }
+        #title-screen[data-theme="egyptian_tomb"] #title-card {
+            background: linear-gradient(145deg, rgba(255, 251, 237, 0.96), rgba(245, 228, 187, 0.95)) !important;
+            border: 2px solid #b88a38 !important;
+            box-shadow: 0 18px 55px rgba(105, 67, 24, 0.22), inset 0 0 0 7px rgba(199, 157, 66, 0.12);
+            backdrop-filter: blur(8px);
+        }
+        #title-screen[data-theme="egyptian_tomb"] #title-card::before {
+            content: "";
+            position: absolute;
+            inset: 10px;
+            border: 1px solid rgba(159, 113, 35, 0.45);
+            pointer-events: none;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .cyber-title {
+            color: #3f2a17;
+            font-family: Georgia, "Times New Roman", serif;
+            letter-spacing: 0.035em;
+            text-shadow: 0 1px 0 #fff7df, 0 3px 0 #d9b96d, 0 7px 18px rgba(106, 68, 25, 0.16);
+            animation: none;
+        }
+        #title-screen[data-theme="egyptian_tomb"] #title-subtitle {
+            color: #17617b !important;
+            letter-spacing: 0.24em !important;
+            font-weight: 700;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .title-corner {
+            border-color: #a87527 !important;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .cyber-btn {
+            color: #174d61 !important;
+            border-color: #b88731 !important;
+            background: rgba(255, 250, 232, 0.82) !important;
+            box-shadow: 0 3px 0 #d6b56e, 0 0 0 1px rgba(23, 97, 123, 0.12) !important;
+        }
+        #title-screen[data-theme="egyptian_tomb"] .cyber-btn:hover {
+            color: #fff8e7 !important;
+            background: #1b647a !important;
+            box-shadow: 0 0 0 2px #d6b56e, 0 8px 22px rgba(27, 100, 122, 0.2) !important;
+        }
+        #title-screen[data-theme="egyptian_tomb"] #boot-status {
+            color: #80643c !important;
+        }
+        #title-screen[data-theme="egyptian_tomb"] #title-footer {
+            color: #72552b !important;
+            border-color: rgba(151, 107, 36, 0.5) !important;
+        }
+
+        /* ICH Crafting: bright cotton-paper, woven geometry, botanical green, terracotta. */
+        #title-screen[data-theme="ich_crafting"] {
+            color: #2c3d33;
+            background: radial-gradient(ellipse at 50% 18%, #fffdf2 0%, #eff0da 52%, #cdddc5 100%) !important;
+        }
+        #title-screen[data-theme="ich_crafting"] .title-pattern {
+            opacity: 0.8;
+            background-image:
+                repeating-linear-gradient(45deg, transparent 0 17px, rgba(174, 104, 70, 0.18) 17px 19px, transparent 19px 35px),
+                repeating-linear-gradient(-45deg, transparent 0 17px, rgba(49, 107, 83, 0.16) 17px 19px, transparent 19px 35px),
+                repeating-linear-gradient(90deg, transparent 0 52px, rgba(49, 107, 83, 0.08) 52px 54px);
+            background-size: 70px 70px, 70px 70px, 70px 70px;
+            transform: none;
+        }
+        #title-screen[data-theme="ich_crafting"] .cable-decor {
+            background: linear-gradient(90deg, #8b563e, #d6a16c, #628c65);
+            border-color: #ad7955;
+            opacity: 0.58;
+        }
+        #title-screen[data-theme="ich_crafting"] .cable-v {
+            border-right-color: #5f8b66;
+        }
+        #title-screen[data-theme="ich_crafting"] #title-card {
+            background: linear-gradient(145deg, rgba(255, 254, 244, 0.97), rgba(236, 239, 216, 0.96)) !important;
+            border: 2px solid #a86a4c !important;
+            box-shadow: 0 18px 50px rgba(53, 80, 55, 0.17), inset 0 0 0 7px rgba(76, 128, 88, 0.08);
+            backdrop-filter: blur(8px);
+        }
+        #title-screen[data-theme="ich_crafting"] #title-card::before {
+            content: "";
+            position: absolute;
+            inset: 10px;
+            border: 1px dashed rgba(67, 118, 79, 0.48);
+            pointer-events: none;
+        }
+        #title-screen[data-theme="ich_crafting"] .cyber-title {
+            color: #2f604a;
+            font-family: "Trebuchet MS", Arial, sans-serif;
+            letter-spacing: 0.01em;
+            text-shadow: 0 2px 0 #fffdf2, 0 5px 0 rgba(183, 126, 82, 0.3);
+            animation: none;
+        }
+        #title-screen[data-theme="ich_crafting"] #title-subtitle {
+            color: #a4533c !important;
+            letter-spacing: 0.18em !important;
+            font-weight: 700;
+        }
+        #title-screen[data-theme="ich_crafting"] .title-corner {
+            border-color: #a86a4c !important;
+        }
+        #title-screen[data-theme="ich_crafting"] .cyber-btn {
+            color: #2f604a !important;
+            border-color: #8caa75 !important;
+            background: rgba(255, 253, 239, 0.88) !important;
+            box-shadow: 0 3px 0 #d3b28f, 0 0 0 1px rgba(73, 120, 83, 0.1) !important;
+        }
+        #title-screen[data-theme="ich_crafting"] .cyber-btn:hover {
+            color: #fff9e9 !important;
+            background: #477b57 !important;
+            box-shadow: 0 0 0 2px #d8ad87, 0 8px 22px rgba(71, 123, 87, 0.2) !important;
+        }
+        #title-screen[data-theme="ich_crafting"] #boot-status {
+            color: #67745b !important;
+        }
+        #title-screen[data-theme="ich_crafting"] #title-footer {
+            color: #52664e !important;
+            border-color: rgba(103, 132, 91, 0.45) !important;
+        }
     </style>
 </head>
 <body>
@@ -173,14 +348,14 @@
     </div>
 
     <!-- TITLE SCREEN -->
-    <div id="title-screen" class="absolute inset-0 z-50 bg-[#020617] flex flex-col items-center justify-center transition-opacity duration-1000 overflow-hidden">
-        <div class="absolute inset-0 opacity-20" style="background-image: linear-gradient(#0ff 1px, transparent 1px), linear-gradient(90deg, #0ff 1px, transparent 1px); background-size: 50px 50px; perspective: 1000px; transform: rotateX(60deg) scale(2);"></div>
+    <div id="title-screen" data-theme="neo_museum" class="absolute inset-0 z-50 bg-[#020617] flex flex-col items-center justify-center transition-opacity duration-1000 overflow-hidden">
+        <div id="title-pattern" class="title-pattern absolute inset-0"></div>
         <div class="cable-decor cable-h"></div>
         <div class="cable-decor cable-v"></div>
         
-        <div class="text-center z-10 p-10 border border-cyan-500/30 bg-black/80 backdrop-blur-sm relative">
-            <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
-            <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
+        <div id="title-card" class="text-center z-10 p-10 border border-cyan-500/30 bg-black/80 backdrop-blur-sm relative">
+            <div class="title-corner absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
+            <div class="title-corner absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
 
             <h1 class="text-6xl md:text-8xl font-bold mb-2 cyber-title tracking-tighter"><span id="title-line-1">NEO</span><br id="title-line-break"><span id="title-line-2">MUSEUM</span></h1>
             <p id="title-subtitle" class="text-cyan-400 text-xl mb-8 font-[Rajdhani] tracking-[0.5em] uppercase">Nyah Lasem Heritage</p>
@@ -275,7 +450,7 @@
             sourceName: 'Google Sheets',
             models: [],
             environment: null,
-            titleScreen: {}
+            theme: { active: 'neo_museum', presets: {} }
         };
 
         function normalizePublishedSheetUrl(rawUrl) {
@@ -313,26 +488,52 @@
                 config.sourceName = sourceConfig.sourceName || 'Google Sheets';
                 config.models = Array.isArray(sourceConfig.models) ? sourceConfig.models : [];
                 config.environment = sourceConfig.environment || null;
-                config.titleScreen = sourceConfig.titleScreen && typeof sourceConfig.titleScreen === 'object'
-                    ? sourceConfig.titleScreen : {};
+                config.theme = sourceConfig.theme && typeof sourceConfig.theme === 'object'
+                    ? sourceConfig.theme : { active: 'neo_museum', presets: {} };
 
-                // Use textContent for configuration strings so branding remains plain text, not injected HTML.
-                const titleScreen = config.titleScreen;
+                const presets = config.theme.presets && typeof config.theme.presets === 'object'
+                    ? config.theme.presets : {};
+                const requestedTheme = typeof config.theme.active === 'string' ? config.theme.active : 'neo_museum';
+                const selectedThemeKey = Object.prototype.hasOwnProperty.call(presets, requestedTheme)
+                    ? requestedTheme
+                    : (Object.prototype.hasOwnProperty.call(presets, 'egyptian_tomb') ? 'egyptian_tomb' : 'neo_museum');
+                const selectedTheme = presets[selectedThemeKey] || {};
+                const supportedThemeStyles = ['neo_museum', 'egyptian_tomb', 'ich_crafting'];
+                const themeStyle = supportedThemeStyles.includes(selectedTheme.style)
+                    ? selectedTheme.style
+                    : (supportedThemeStyles.includes(selectedThemeKey) ? selectedThemeKey : 'neo_museum');
+
+                const titleScreen = document.getElementById('title-screen');
+                if (titleScreen) titleScreen.dataset.theme = themeStyle;
+
+                // Backward compatibility for older configs that used the previous titleScreen object.
+                const legacyTitleScreen = sourceConfig.titleScreen && typeof sourceConfig.titleScreen === 'object'
+                    ? sourceConfig.titleScreen : {};
+                const line1Text = typeof selectedTheme.titleLine1 === 'string'
+                    ? selectedTheme.titleLine1
+                    : (typeof legacyTitleScreen.titleLine1 === 'string' ? legacyTitleScreen.titleLine1 : 'NEO');
+                const line2Text = typeof selectedTheme.titleLine2 === 'string'
+                    ? selectedTheme.titleLine2
+                    : (typeof legacyTitleScreen.titleLine2 === 'string' ? legacyTitleScreen.titleLine2 : 'MUSEUM');
+                const subtitleText = typeof selectedTheme.subtitle === 'string'
+                    ? selectedTheme.subtitle
+                    : (typeof legacyTitleScreen.subtitle === 'string' ? legacyTitleScreen.subtitle : 'Nyah Lasem Heritage');
+                const footerText = typeof selectedTheme.footerText === 'string'
+                    ? selectedTheme.footerText
+                    : (typeof legacyTitleScreen.footerText === 'string'
+                        ? legacyTitleScreen.footerText : 'SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026');
+
                 const titleLine1 = document.getElementById('title-line-1');
                 const titleLine2 = document.getElementById('title-line-2');
                 const titleLineBreak = document.getElementById('title-line-break');
                 const subtitleEl = document.getElementById('title-subtitle');
                 const footerEl = document.getElementById('title-footer');
-                const line1Text = typeof titleScreen.titleLine1 === 'string' ? titleScreen.titleLine1 : 'NEO';
-                const line2Text = typeof titleScreen.titleLine2 === 'string' ? titleScreen.titleLine2 : 'MUSEUM';
-                const subtitleText = typeof titleScreen.subtitle === 'string' ? titleScreen.subtitle : 'Nyah Lasem Heritage';
-                const footerText = typeof titleScreen.footerText === 'string'
-                    ? titleScreen.footerText : 'SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026';
-
                 if (titleLine1) titleLine1.textContent = line1Text;
-                if (titleLine2) titleLine2.textContent = line2Text;
+                if (titleLine2) {
+                    titleLine2.textContent = line2Text;
+                    titleLine2.style.display = line2Text ? '' : 'none';
+                }
                 if (titleLineBreak) titleLineBreak.style.display = line2Text ? '' : 'none';
-                if (titleLine2) titleLine2.style.display = line2Text ? '' : 'none';
                 if (subtitleEl) {
                     subtitleEl.textContent = subtitleText;
                     subtitleEl.style.display = subtitleText ? '' : 'none';
@@ -341,7 +542,6 @@
                     footerEl.textContent = footerText;
                     footerEl.style.display = footerText ? '' : 'none';
                 }
-
                 const sourceLink = document.getElementById('sheet-source-url');
                 if (sourceLink) sourceLink.textContent = config.sourceName + ' (published CSV)';
                 console.info('[SOURCE CONFIG] CSV endpoint:', config.sheetUrl);
