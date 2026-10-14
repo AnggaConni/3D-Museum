@@ -95,7 +95,7 @@ The generated city skyline has been replaced by a configurable GLB environment, 
 "environment": {
   "enabled": true,
   "url": "./amphitheater/amphitheatre.glb",
-  "targetWidth": 200,
+  "targetWidth": 270,
   "rotationY": 0,
   "position": [0, 0, 0]
 }
@@ -106,6 +106,24 @@ The generated city skyline has been replaced by a configurable GLB environment, 
 - `position` is an optional `[x, y, z]` offset after the model is centered and aligned to ground level.
 - Set `enabled` to `false` to hide the environment model.
 - The background environment is excluded from hover/click raycasting so internal names inside the GLB cannot override the three category tooltips.
+
+### Title screen branding
+
+Edit the `titleScreen` object in `source.json` to change the opening screen without touching `index.html`:
+
+```json
+"titleScreen": {
+  "titleLine1": "NEO",
+  "titleLine2": "MUSEUM",
+  "subtitle": "Nyah Lasem Heritage",
+  "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
+}
+```
+
+- `titleLine1` and `titleLine2` are the two title lines; set `titleLine2` to an empty string for a single-line heading.
+- `subtitle` controls the heritage/project subtitle.
+- `footerText` controls the small footer at the bottom of the opening screen.
+- These values are inserted as plain text, so they are not interpreted as HTML.
 
 ## How it works
 
