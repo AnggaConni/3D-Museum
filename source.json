@@ -1,5 +1,44 @@
 {
   "_instructions": "To use your own collection, replace sheetUrl with your own Google Sheets Publish to web CSV URL.",
   "sourceName": "Katalog artifak",
-  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwKmyadrIerG4AoqamYKVD39UpeA0s0poj0c1bAmGDoR9XfRPEq0SfjEByFZHTx51ywlLqEupcIWxJ/pubhtml"
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwKmyadrIerG4AoqamYKVD39UpeA0s0poj0c1bAmGDoR9XfRPEq0SfjEByFZHTx51ywlLqEupcIWxJ/pubhtml",
+  "models": [
+    {
+      "id": "shipwreck",
+      "category": "underwater",
+      "enabled": true,
+      "url": "./models/shipwreck.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "african-hut",
+      "category": "ancient_craft",
+      "enabled": true,
+      "url": "./models/african%20hut.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "museum",
+      "category": "museum",
+      "enabled": true,
+      "url": "./models/museum.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "artifact",
+      "category": null,
+      "enabled": false,
+      "url": "./models/artifact.glb",
+      "targetSize": 8,
+      "note": "Reserved for later; not assigned to one of the three current data categories."
+    },
+    {
+      "id": "statue",
+      "category": null,
+      "enabled": false,
+      "url": "./models/statue.glb",
+      "targetSize": 8,
+      "note": "Reserved for later; not assigned to one of the three current data categories."
+    }
+  ]
 }
