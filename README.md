@@ -84,9 +84,16 @@ The easiest option is an <code>image_urls</code> column. Paste public image link
 
 You can keep using <code>image_url</code> for one image, or create separate columns named <code>image_url_1</code>, <code>image_url_2</code>, and <code>image_url_3</code>. The artefact window shows the available pictures as a carousel. Use the arrow buttons to browse and **View full screen** to enlarge a picture. Use image URLs that visitors can open without logging in.
 
-### Format descriptions with bold text, tables, and links
+### Description: plain text is recommended; HTML is optional
 
-The <code>description</code> cell accepts plain text or a small, safe set of HTML tags. For example, copy this as text into a spreadsheet cell, then replace the sample words and link:
+> [!TIP]
+> **Not sure what HTML is? Just type a normal description in the Google Sheets cell.**
+> Plain text is the easiest option, works well for most collections, and avoids mistakes caused by tags or pasted formatting. You do not need to learn HTML to use this museum.
+
+> [!NOTE]
+> Use HTML only when you specifically need formatting such as **bold labels, tables, lists, or links**. The museum filters the supported HTML before displaying it, but plain text is still the recommended choice for beginners.
+
+If you want advanced formatting, the <code>description</code> cell accepts a small, safe set of HTML tags. For example, copy this as text into a spreadsheet cell, then replace the sample words and link:
 
 <pre><code>&lt;p&gt;&lt;strong&gt;Origin:&lt;/strong&gt; Wae Rebo, Flores.&lt;/p&gt;
 &lt;p&gt;This traditional house represents local knowledge.
