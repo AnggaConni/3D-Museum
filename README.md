@@ -107,23 +107,49 @@ The generated city skyline has been replaced by a configurable GLB environment, 
 - Set `enabled` to `false` to hide the environment model.
 - The background environment is excluded from hover/click raycasting so internal names inside the GLB cannot override the three category tooltips.
 
-### Title screen branding
+### Theme presets
 
-Edit the `titleScreen` object in `source.json` to change the opening screen without touching `index.html`:
+Choose the opening-screen theme in `source.json` by changing only the `theme.active` value. The three built-in presets are:
+
+- `egyptian_tomb` — default: bright limestone/papyrus background, antique gold and lapis-blue details.
+- `ich_crafting` — bright cotton-paper palette with woven geometric motifs, botanical green and terracotta accents.
+- `neo_museum` — original dark cyberpunk grid with neon cyan.
+
+Example:
 
 ```json
-"titleScreen": {
-  "titleLine1": "NEO",
-  "titleLine2": "MUSEUM",
-  "subtitle": "Nyah Lasem Heritage",
-  "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
+"theme": {
+  "active": "egyptian_tomb",
+  "presets": {
+    "neo_museum": {
+      "label": "NEO Museum",
+      "style": "neo_museum",
+      "titleLine1": "NEO",
+      "titleLine2": "MUSEUM",
+      "subtitle": "Nyah Lasem Heritage",
+      "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
+    },
+    "egyptian_tomb": {
+      "label": "Egyptian Tomb",
+      "style": "egyptian_tomb",
+      "titleLine1": "EGYPTIAN",
+      "titleLine2": "ARTIFACTS",
+      "subtitle": "Tomb of Ancient Treasures",
+      "footerText": "A JOURNEY INTO ANCIENT EGYPT"
+    },
+    "ich_crafting": {
+      "label": "ICH Crafting",
+      "style": "ich_crafting",
+      "titleLine1": "LIVING",
+      "titleLine2": "CRAFTS",
+      "subtitle": "Intangible Cultural Heritage",
+      "footerText": "TRADITION • KNOWLEDGE • COMMUNITY"
+    }
+  }
 }
 ```
 
-- `titleLine1` and `titleLine2` are the two title lines; set `titleLine2` to an empty string for a single-line heading.
-- `subtitle` controls the heritage/project subtitle.
-- `footerText` controls the small footer at the bottom of the opening screen.
-- These values are inserted as plain text, so they are not interpreted as HTML.
+Change `"active": "egyptian_tomb"` to `"active": "ich_crafting"` or `"active": "neo_museum"` to test another look. The title text is inserted as plain text, not HTML. Earlier `titleScreen`-only configuration is still supported as a fallback for older copies.
 
 ## How it works
 
