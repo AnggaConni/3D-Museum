@@ -188,6 +188,13 @@ Set <code>theme.active</code> to one of these values:
 
 The <code>theme.presets</code> object stores the text and style for each theme. The visual editor changes the selected preset for you.
 
+The two light themes also use the texture files in `assets/theme/`:
+
+- `Vintage Sage and Terracotta Kilim Tile.png` is used for ICH Crafting.
+- `Aged Egyptian Hieroglyphic Frieze Wallpaper.png` is used for Egyptian Tomb.
+
+Each image is tiled across the title screen beneath a translucent colour wash, keeping the central title card readable. Keep the filenames and paths unchanged, or update the CSS URLs in `index.html` if you replace the images. NEO Museum keeps its original dark neon grid.
+
 ### Category models
 
 Each object in <code>models</code> supports <code>id</code>, <code>category</code>, <code>enabled</code>, <code>url</code>, and <code>targetSize</code>.
