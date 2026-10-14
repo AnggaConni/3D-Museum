@@ -350,7 +350,7 @@
         let objectsToIntersect = []; 
         let roomObjects = []; 
         let activeFishes = []; 
-        let dirLight, ambientLight;
+        let dirLight, ambientLight, hemiLight;
         let audioCtx; 
 
         // --- AUDIO SYSTEM ---
@@ -698,8 +698,13 @@
         function setupLights() {
             ambientLight = new THREE.AmbientLight(0xffffff, 0.3);
             scene.add(ambientLight);
-            dirLight = new THREE.DirectionalLight(0xa5f3fc, 0.5);
-            dirLight.position.set(20, 30, 20);
+
+            // Reusable sky/ground fill light for the bright outdoor museum map.
+            hemiLight = new THREE.HemisphereLight(0x8bcfff, 0xb9a17d, 0.0);
+            scene.add(hemiLight);
+
+            dirLight = new THREE.DirectionalLight(0xffe8c5, 0.5);
+            dirLight.position.set(-30, 70, 20);
             dirLight.castShadow = true;
             dirLight.shadow.mapSize.width = 2048;
             dirLight.shadow.mapSize.height = 2048;
@@ -763,26 +768,39 @@
             const displayEl = document.getElementById('data-display');
             if (displayEl) displayEl.innerText = state.allData.length + ' Artifacts Ready';
 
-            // Keep the original city environment for this phase. Background work comes later.
-            gsap.to(scene.background, { r: 0.01, g: 0.02, b: 0.05, duration: 1 });
-            scene.fog = new THREE.FogExp2(0x020617, 0.01);
-            dirLight.intensity = 0.8; ambientLight.intensity = 0.5;
+            // Clear bright-blue sky with warm late-afternoon sunlight.
+            scene.background.setHex(0x78bdf5);
+            scene.fog = new THREE.FogExp2(0xb7dcf6, 0.0015);
+            dirLight.color.setHex(0xffe2b5);
+            dirLight.position.set(-30, 70, 20);
+            dirLight.intensity = 2.0;
+            ambientLight.intensity = 1.15;
+            if (hemiLight) {
+                hemiLight.color.setHex(0x8bcfff);
+                hemiLight.groundColor.setHex(0xc9b18d);
+                hemiLight.intensity = 1.1;
+            }
             controls.enabled = true; controls.enableZoom = false; controls.enablePan = false;
             controls.maxPolarAngle = Math.PI / 2.2; controls.minPolarAngle = Math.PI / 4;
             gsap.to(camera.position, { x: 0, y: 15, z: 40, duration: 1.5, ease: 'power2.inOut' });
 
-            const groundGeo = new THREE.PlaneGeometry(300, 300);
-            const pavingTex = createPavementTexture();
-            const groundMat = new THREE.MeshStandardMaterial({ map: pavingTex, roughness: 0.8, color: 0x888888 });
-            const ground = new THREE.Mesh(groundGeo, groundMat);
-            ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
-            scene.add(ground);
+            const environmentConfig = config.environment || {};
+            const useEnvironment = environmentConfig.enabled !== false && Boolean(environmentConfig.url);
+
+            // Use the amphitheatre floor when the GLB environment is enabled. A fallback grid is only used without it.
+            if (!useEnvironment) {
+                const groundGeo = new THREE.PlaneGeometry(300, 300);
+                const pavingTex = createPavementTexture();
+                const groundMat = new THREE.MeshStandardMaterial({ map: pavingTex, roughness: 0.8, color: 0x888888 });
+                const ground = new THREE.Mesh(groundGeo, groundMat);
+                ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
+                scene.add(ground);
+            }
 
             // Load a configurable GLB environment around the three category displays.
             // Do not add the environment to objectsToIntersect: its internal mesh names must not trigger tooltips.
             const loader = new THREE.GLTFLoader();
-            const environmentConfig = config.environment || {};
-            if (environmentConfig.enabled !== false && environmentConfig.url) {
+            if (useEnvironment) {
                 loader.load(
                     environmentConfig.url,
                     gltf => {
@@ -935,6 +953,8 @@
         // --- ROOM SCENE ---
         function createRoomScene(category, roomIndex) {
             clearScene(); state.scene = 'ROOM'; state.currentRoomIndex = roomIndex;
+            if (hemiLight) hemiLight.intensity = 0.0;
+            dirLight.position.set(20, 30, 20);
             let floorColor = config.floorColor; let wallColor = config.wallColor;
             let lightIntensity = 0.8; let ambIntensity = 0.3;
             let isWaterFloor = false; let isRockWall = false; let isBambooWall = false; let isSoilFloor = false; let isTileFloor = false; let isIndustrialMuseum = false;
