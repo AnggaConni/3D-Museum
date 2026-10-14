@@ -2,7 +2,7 @@
 
 A browser-based 3D exhibition that reads collection metadata from a Google Sheets CSV published to the web. Built with Three.js and designed to be adapted by museums, schools, community groups, and heritage projects.
 
-**The Google Sheets URL is configured in `source.json`**, so users can change their data source without editing application code.
+**The Google Sheets URL and 3D category models are configured in `source.json`**, so users can change the data source or swap model files without editing application code.
 
 ## Visual setup guide
 
@@ -36,16 +36,62 @@ Example `source.json`:
 {
   "_instructions": "Copy your Google Sheets Publish to web CSV URL into sheetUrl. Keep this file beside index.html.",
   "sourceName": "My Museum Collection",
-  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID/pub?output=csv"
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID/pub?output=csv",
+  "models": [
+    {
+      "id": "shipwreck",
+      "category": "underwater",
+      "enabled": true,
+      "url": "./models/shipwreck.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "african-hut",
+      "category": "ancient_craft",
+      "enabled": true,
+      "url": "./models/african%20hut.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "museum",
+      "category": "museum",
+      "enabled": true,
+      "url": "./models/museum.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "artifact",
+      "category": null,
+      "enabled": false,
+      "url": "./models/artifact.glb",
+      "targetSize": 8
+    },
+    {
+      "id": "statue",
+      "category": null,
+      "enabled": false,
+      "url": "./models/statue.glb",
+      "targetSize": 8
+    }
+  ]
 }
 ```
 
 Keep Google's exact published URL, including `output=csv` when provided.
 
+### 3D model configuration
+
+- The three active models match the existing Google Sheets categories: `underwater`, `ancient_craft`, and `museum`.
+- `targetSize: 8` normalizes each model to the same largest bounding-box dimension while preserving its original proportions. The model is centered and placed on the category platform.
+- `enabled: false` disables a configured model. The `artifact.glb` and `statue.glb` files are included as inactive extras because they are not assigned to one of the three current categories.
+- Put replacement `.glb` files in the `models/` folder and change only the matching `url` in `source.json`. Use URL-encoded spaces, such as `african%20hut.glb`, for filenames containing spaces.
+- Large GLB files may take longer to load on mobile connections. Optimize/compress them before adding substantially larger assets.
+
 ## How it works
 
 - `index.html` loads `source.json` at startup.
-- `source.json` contains the published CSV URL and collection display name.
+- `source.json` contains the published CSV URL, collection display name, and enabled/disabled GLB model mapping.
+- Three.js `GLTFLoader` loads the selected local `.glb` files; each active category model is scaled to a shared maximum dimension, centered, and placed on its display base.
 - PapaParse maps the sheet's rows into records rendered in the 3D scene.
 - The sheet must be published for browser-based access. **Do not publish passwords, private data, API keys, or confidential records**; published output may be readable by visitors.
 - Google publishing settings, browser CORS restrictions, network connectivity, and third-party service availability may affect loading.
@@ -86,6 +132,7 @@ The custom `favicon.svg` is linked from `index.html`. Replace it with your own i
 - **Google Sheets Publish to web (CSV):** simple data source under Google's standard service limits.
 - **Three.js:** 3D scene and rendering.
 - **OrbitControls:** camera interaction.
+- **GLTFLoader:** loads the local `.glb` category models.
 - **GSAP:** animation.
 - **Tailwind CSS CDN:** interface styling.
 - **PapaParse:** CSV parsing.
@@ -98,6 +145,7 @@ Third-party libraries are loaded from public CDNs, so an internet connection is 
 
 - **Configuration error:** validate `source.json` JSON syntax and check that `sheetUrl` contains the full published CSV URL.
 - **No live data:** publish the correct sheet/tab as CSV, and ensure categories match `underwater`, `ancient_craft`, or `museum`.
+- **A 3D model is missing:** check its `url` in `source.json`, confirm the file exists in `models/`, and make sure its `enabled` value is `true` and its `category` matches one of the current categories.
 - **Browser fetch failure:** open the published CSV URL directly to confirm it is accessible. The proxy fallback may help with CORS but is not guaranteed.
 - **Images not shown:** verify the image URL is public. Google Drive images may need public viewing permissions.
 
