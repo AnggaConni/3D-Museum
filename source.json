@@ -1,5 +1,5 @@
 {
   "_instructions": "To use your own collection, replace sheetUrl with your own Google Sheets Publish to web CSV URL.",
   "sourceName": "Katalog artifak",
-  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwKmyadrIerG4AoqamYKVD39UpeA0s0poj0c1bAmGDoR9XfRPEq0SfjEByFZHTx51ywlLqEupcIWxJ/pub?output=csv"
+  "sheetUrl": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQwKmyadrIerG4AoqamYKVD39UpeA0s0poj0c1bAmGDoR9XfRPEq0SfjEByFZHTx51ywlLqEupcIWxJ/pubhtml"
 }
