@@ -26,6 +26,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <!-- Orbit Controls -->
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <!-- GLB / glTF model loader (same Three.js version) -->
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <!-- GSAP for Animations -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <!-- Tailwind CSS -->
@@ -270,7 +272,8 @@
             floorColor: 0x0f172a,
             accentColor: 0x06b6d4,
             sheetUrl: '',
-            sourceName: 'Google Sheets'
+            sourceName: 'Google Sheets',
+            models: []
         };
 
         async function loadSourceConfig() {
@@ -284,6 +287,7 @@
                 }
                 config.sheetUrl = sheetUrl;
                 config.sourceName = sourceConfig.sourceName || 'Google Sheets';
+                config.models = Array.isArray(sourceConfig.models) ? sourceConfig.models : [];
                 const sourceLink = document.getElementById('sheet-source-url');
                 if (sourceLink) sourceLink.textContent = config.sourceName + ' (published CSV)';
                 return true;
@@ -607,92 +611,150 @@
         // --- MAP SCENE ---
         function createMapScene() {
             clearScene(); state.scene = 'MAP';
-            
+
             const displayEl = document.getElementById('data-display');
-            if(displayEl) displayEl.innerText = `${state.allData.length} Artifacts Ready`;
-            
-            gsap.to(scene.background, { r: 0.01, g: 0.02, b: 0.05, duration: 1 }); 
-            scene.fog = new THREE.FogExp2(0x020617, 0.01); 
+            if (displayEl) displayEl.innerText = state.allData.length + ' Artifacts Ready';
+
+            // Keep the original city environment for this phase. Background work comes later.
+            gsap.to(scene.background, { r: 0.01, g: 0.02, b: 0.05, duration: 1 });
+            scene.fog = new THREE.FogExp2(0x020617, 0.01);
             dirLight.intensity = 0.8; ambientLight.intensity = 0.5;
             controls.enabled = true; controls.enableZoom = false; controls.enablePan = false;
             controls.maxPolarAngle = Math.PI / 2.2; controls.minPolarAngle = Math.PI / 4;
-            gsap.to(camera.position, { x: 0, y: 15, z: 40, duration: 1.5, ease: "power2.inOut" });
+            gsap.to(camera.position, { x: 0, y: 15, z: 40, duration: 1.5, ease: 'power2.inOut' });
 
             const groundGeo = new THREE.PlaneGeometry(300, 300);
             const pavingTex = createPavementTexture();
             const groundMat = new THREE.MeshStandardMaterial({ map: pavingTex, roughness: 0.8, color: 0x888888 });
-            const ground = new THREE.Mesh(groundGeo, groundMat); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
+            const ground = new THREE.Mesh(groundGeo, groundMat);
+            ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
             scene.add(ground);
 
             const buildMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
-            // UPGRADED TEXTURE CALL
             const windowTex = createWindowTexture();
             const winMat = new THREE.MeshBasicMaterial({ map: windowTex });
-            
-            for(let i=0; i<300; i++) { 
-                const angle = Math.random() * Math.PI * 2; const radius = 60 + Math.random() * 60; 
-                const bx = Math.cos(angle) * radius; const bz = Math.sin(angle) * radius;
-                const height = 4 + Math.random() * 12; const width = 1.5 + Math.random() * 2.5; 
+
+            // Original generated city skyline remains unchanged until the environment phase.
+            for (let i = 0; i < 300; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 60 + Math.random() * 60;
+                const bx = Math.cos(angle) * radius;
+                const bz = Math.sin(angle) * radius;
+                const height = 4 + Math.random() * 12;
+                const width = 1.5 + Math.random() * 2.5;
                 const buildGeo = new THREE.BoxGeometry(width, height, width);
                 const building = new THREE.Mesh(buildGeo, [winMat, winMat, buildMat, buildMat, winMat, winMat]);
-                building.position.set(bx, height/2, bz); building.lookAt(0, height/2, 0); scene.add(building);
+                building.position.set(bx, height / 2, bz);
+                building.lookAt(0, height / 2, 0);
+                scene.add(building);
             }
 
-            // Ship Model
-            const shipGroup = new THREE.Group(); shipGroup.position.set(-14, 0, 0);
-            const waterGeo = new THREE.CylinderGeometry(5, 5, 0.2, 32);
-            const waterMat = new THREE.MeshStandardMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.7, roughness: 0.2, emissive: 0x0044aa, emissiveIntensity: 0.2 });
-            const waterBase = new THREE.Mesh(waterGeo, waterMat); waterBase.position.y = 0.1; shipGroup.add(waterBase);
-            const hullGeo = new THREE.SphereGeometry(2.5, 32, 16, 0, Math.PI * 2, 0, Math.PI / 2); 
-            const hullMat = new THREE.MeshStandardMaterial({ color: 0x855E42, roughness: 0.8 }); 
-            const hull = new THREE.Mesh(hullGeo, hullMat); hull.scale.set(1, 0.8, 2.5); hull.rotation.x = Math.PI; hull.position.y = 2.2; shipGroup.add(hull);
-            const deckGeo = new THREE.CircleGeometry(2.4, 32); const deckMat = new THREE.MeshStandardMaterial({ color: 0x5c4033 });
-            const deck = new THREE.Mesh(deckGeo, deckMat); deck.rotation.x = -Math.PI / 2; deck.position.y = 2.2; deck.scale.set(1, 2.5, 1); shipGroup.add(deck);
-            const mastGeo = new THREE.CylinderGeometry(0.1, 0.1, 5); const mast = new THREE.Mesh(mastGeo, deckMat); mast.position.set(0, 4.5, 0); shipGroup.add(mast);
-            const sailGeo = new THREE.ConeGeometry(1.5, 3, 3); sailGeo.scale(1, 1, 0.1);
-            const sailMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0xaaaaaa, emissiveIntensity: 0.2 });
-            const sail = new THREE.Mesh(sailGeo, sailMat); sail.position.set(0.8, 5, 0); sail.rotation.z = -Math.PI / 8; shipGroup.add(sail);
-            
-            // FIXED: Correct Category Name from Sheet
-            shipGroup.userData = { type: 'category', value: 'underwater', name: 'Underwater Heritage', desc: 'Ancient Shipwrecks' };
-            scene.add(shipGroup); objectsToIntersect.push(shipGroup); addFloatingAnimation(shipGroup, 0); addBreathingAnimation(shipGroup);
+            // Use only the three categories already present in the current Google Sheets data.
+            // Each downloaded model is uniformly scaled to the same maximum bounding-box dimension.
+            const categorySlots = [
+                { id: 'underwater', x: -14, label: 'Underwater Heritage', desc: 'Ancient Shipwrecks', platformTop: 0.2, platform: 'water', delay: 0 },
+                { id: 'ancient_craft', x: 0, label: 'Ancient Craft Gallery', desc: 'Traditional Cultural Heritage', platformTop: 0.5, platform: 'stone', delay: 1 },
+                { id: 'museum', x: 14, label: 'General Museum', desc: 'Artifacts Gallery', platformTop: 0.2, platform: 'museum', delay: 2 }
+            ];
 
-            // Wae Rebo Model
-            const houseGroup = new THREE.Group(); houseGroup.position.set(0, 0, 0);
-            const stoneBaseGeo = new THREE.CylinderGeometry(3.5, 4, 0.5, 16);
-            const stoneMat = new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.9 });
-            const stoneBase = new THREE.Mesh(stoneBaseGeo, stoneMat); stoneBase.position.y = 0.25; houseGroup.add(stoneBase);
-            const roofGeo = new THREE.ConeGeometry(3.2, 7, 16, 4, true); 
-            const thatchMat = new THREE.MeshStandardMaterial({ color: 0x5D4037, roughness: 1.0 }); 
-            const roof = new THREE.Mesh(roofGeo, thatchMat); roof.position.y = 4; houseGroup.add(roof);
-            const finialGeo = new THREE.CylinderGeometry(0.1, 0.3, 1, 8);
-            const woodFinialMat = new THREE.MeshStandardMaterial({ color: 0x271c19 });
-            const finial = new THREE.Mesh(finialGeo, woodFinialMat); finial.position.y = 7.5; houseGroup.add(finial);
-            const doorGeo = new THREE.BoxGeometry(1, 1.5, 0.5);
-            const doorMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-            const door = new THREE.Mesh(doorGeo, doorMat); door.position.set(0, 1.25, 2.8); door.rotation.x = -0.2; houseGroup.add(door);
-            
-            // FIXED: Correct Category Name from Sheet
-            houseGroup.userData = { type: 'category', value: 'ancient_craft', name: 'Ancient Craft Gallery', desc: 'Ancient Artifact - ICH' };
-            scene.add(houseGroup); objectsToIntersect.push(houseGroup); addFloatingAnimation(houseGroup, 1); addBreathingAnimation(houseGroup);
+            const loader = new THREE.GLTFLoader();
 
-            // Museum Model
-            const museumGroup = new THREE.Group(); museumGroup.position.set(14, 0, 0);
-            const padGeo = new THREE.CylinderGeometry(5, 5, 0.2, 32);
-            const padMat = new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.8 }); 
-            const padBase = new THREE.Mesh(padGeo, padMat); padBase.position.y = 0.1; museumGroup.add(padBase);
-            const mBodyGeo = new THREE.BoxGeometry(5, 3, 4);
-            const concreteMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, emissive: 0x333333, emissiveIntensity: 0.2 });
-            const mBody = new THREE.Mesh(mBodyGeo, concreteMat); mBody.position.y = 1.75; museumGroup.add(mBody);
-            const pillarGeo = new THREE.CylinderGeometry(0.3, 0.3, 3);
-            for(let i=-1.5; i<=1.5; i+=1) { const pillar = new THREE.Mesh(pillarGeo, concreteMat); pillar.position.set(i, 1.75, 2.2); museumGroup.add(pillar); }
-            const pedimentGeo = new THREE.CylinderGeometry(0, 3.5, 5, 3);
-            const pediment = new THREE.Mesh(pedimentGeo, concreteMat); pediment.rotation.z = Math.PI / 2; pediment.rotation.x = Math.PI / 2; 
-            pediment.scale.set(1, 0.5, 1); pediment.position.set(0, 4.2, 0); museumGroup.add(pediment);
-            
-            // FIXED: Correct Category Name from Sheet
-            museumGroup.userData = { type: 'category', value: 'museum', name: 'General Museum', desc: 'Artifacts Gallery' };
-            scene.add(museumGroup); objectsToIntersect.push(museumGroup); addFloatingAnimation(museumGroup, 2); addBreathingAnimation(museumGroup);
+            categorySlots.forEach(slot => {
+                const modelConfig = config.models.find(item => item && item.category === slot.id);
+                if (!modelConfig || modelConfig.enabled === false) {
+                    console.info('[3D MODEL] Category disabled or not configured:', slot.id);
+                    return;
+                }
+
+                const categoryGroup = new THREE.Group();
+                categoryGroup.position.set(slot.x, 0, 0);
+                categoryGroup.userData = {
+                    type: 'category',
+                    value: slot.id,
+                    name: slot.label,
+                    desc: slot.desc
+                };
+
+                // Retain the original display bases while replacing the primitive category models.
+                let platform;
+                if (slot.platform === 'water') {
+                    platform = new THREE.Mesh(
+                        new THREE.CylinderGeometry(5, 5, 0.2, 32),
+                        new THREE.MeshStandardMaterial({
+                            color: 0x3b82f6, transparent: true, opacity: 0.7,
+                            roughness: 0.2, emissive: 0x0044aa, emissiveIntensity: 0.2
+                        })
+                    );
+                } else if (slot.platform === 'stone') {
+                    platform = new THREE.Mesh(
+                        new THREE.CylinderGeometry(3.5, 4, 0.5, 16),
+                        new THREE.MeshStandardMaterial({ color: 0x57534e, roughness: 0.9 })
+                    );
+                } else {
+                    platform = new THREE.Mesh(
+                        new THREE.CylinderGeometry(5, 5, 0.2, 32),
+                        new THREE.MeshStandardMaterial({ color: 0x555555, roughness: 0.8 })
+                    );
+                }
+                platform.position.y = slot.platformTop / 2;
+                platform.receiveShadow = true;
+                categoryGroup.add(platform);
+
+                scene.add(categoryGroup);
+                objectsToIntersect.push(categoryGroup);
+                addFloatingAnimation(categoryGroup, slot.delay);
+                addBreathingAnimation(categoryGroup);
+
+                const modelUrl = modelConfig.url;
+                if (!modelUrl) {
+                    console.warn('[3D MODEL] Missing URL for category:', slot.id);
+                    return;
+                }
+
+                loader.load(
+                    modelUrl,
+                    gltf => {
+                        // Ignore a late download if the user has already left the map scene.
+                        if (state.scene !== 'MAP' || !categoryGroup.parent) return;
+
+                        const model = gltf.scene;
+                        const originalBox = new THREE.Box3().setFromObject(model);
+                        const originalSize = originalBox.getSize(new THREE.Vector3());
+                        const maxDimension = Math.max(originalSize.x, originalSize.y, originalSize.z);
+
+                        if (!Number.isFinite(maxDimension) || maxDimension <= 0) {
+                            console.error('[3D MODEL] Invalid model dimensions:', slot.id, modelUrl);
+                            return;
+                        }
+
+                        const targetSize = Number(modelConfig.targetSize) || 8;
+                        model.scale.setScalar(targetSize / maxDimension);
+                        model.updateMatrixWorld(true);
+
+                        // Center the model on its platform and align its lowest point to the platform top.
+                        const fittedBox = new THREE.Box3().setFromObject(model);
+                        const fittedCenter = fittedBox.getCenter(new THREE.Vector3());
+                        model.position.x -= fittedCenter.x;
+                        model.position.z -= fittedCenter.z;
+                        model.position.y -= fittedBox.min.y;
+                        model.position.y += slot.platformTop;
+
+                        model.traverse(child => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+
+                        categoryGroup.add(model);
+                        console.info('[3D MODEL] Loaded and normalized:', slot.id, modelUrl, 'target size:', targetSize);
+                    },
+                    undefined,
+                    error => {
+                        console.error('[3D MODEL] Failed to load:', slot.id, modelUrl, error);
+                    }
+                );
+            });
         }
 
         // --- ROOM SCENE ---
