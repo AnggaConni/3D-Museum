@@ -87,6 +87,26 @@ Keep Google's exact published URL, including `output=csv` when provided.
 - Put replacement `.glb` files in the `models/` folder and change only the matching `url` in `source.json`. Use URL-encoded spaces, such as `african%20hut.glb`, for filenames containing spaces.
 - Large GLB files may take longer to load on mobile connections. Optimize/compress them before adding substantially larger assets.
 
+### 3D environment configuration
+
+The city skyline has been replaced by a configurable GLB environment, currently `amphitheater/amphitheatre.glb`. Change the `environment` object in `source.json` to disable or replace it:
+
+```json
+"environment": {
+  "enabled": true,
+  "url": "./amphitheater/amphitheatre.glb",
+  "targetWidth": 120,
+  "rotationY": 0,
+  "position": [0, 0, 0]
+}
+```
+
+- `targetWidth` controls the environment's horizontal footprint in Three.js scene units; proportions are preserved.
+- `rotationY` rotates the model around its vertical axis, in degrees.
+- `position` is an optional `[x, y, z]` offset after the model is centered and aligned to ground level.
+- Set `enabled` to `false` to hide the environment model.
+- The background environment is excluded from hover/click raycasting so internal names inside the GLB cannot override the three category tooltips.
+
 ## How it works
 
 - `index.html` loads `source.json` at startup.
@@ -146,7 +166,9 @@ Third-party libraries are loaded from public CDNs, so an internet connection is 
 
 - **Configuration error:** validate `source.json` JSON syntax and check that `sheetUrl` contains the full published CSV URL.
 - **No live data:** publish the correct sheet/tab as CSV, and ensure categories match `underwater`, `ancient_craft`, or `museum`.
-- **A 3D model is missing:** check its `url` in `source.json`, confirm the file exists in `models/`, and make sure its `enabled` value is `true` and its `category` matches one of the current categories.
+- **A category tooltip shows a strange model-part name:** the app now resolves hover/clicks to the parent category group, rather than using internal names from GLB meshes.
+- **The amphitheatre background does not appear:** verify `environment.url` in `source.json` and confirm `amphitheater/amphitheatre.glb` exists in the repository. Check the browser Console for `[ENVIRONMENT]` messages.
+- **A 3D category model is missing:** check its `url` in `source.json`, confirm the file exists in `models/`, and make sure its `enabled` value is `true` and its `category` matches one of the current categories.
 - **Browser fetch failure:** confirm `source.json` uses the published CSV URL (normally ending in `/pub?output=csv`), not the HTML page URL ending in `/pubhtml`. The app now converts `/pubhtml` URLs automatically, but the configured source should still be a published sheet.
 - **Stuck on Connecting:** open the browser DevTools Console. Each retrieval route has a timeout and logs its own failure reason; public proxy services can still experience outages.
 - **PapaParse unavailable:** a built-in CSV parser is used as a fallback. If the source is HTML or the CSV is missing `category` and `title`-type headers, the loader rejects it with a diagnostic instead of pretending it is live data.
