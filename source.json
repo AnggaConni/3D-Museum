@@ -1,0 +1,5 @@
+{
+  "_instructions": "Copy your Google Sheets Publish to web CSV URL into sheetUrl. Keep this file beside index.html.",
+  "sourceName": "My Museum Collection",
+  "sheetUrl": "PASTE_YOUR_PUBLISHED_GOOGLE_SHEETS_CSV_URL_HERE"
+}
