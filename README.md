@@ -89,13 +89,13 @@ Keep Google's exact published URL, including `output=csv` when provided.
 
 ### 3D environment configuration
 
-The city skyline has been replaced by a configurable GLB environment, currently `amphitheater/amphitheatre.glb`. Change the `environment` object in `source.json` to disable or replace it:
+The generated city skyline has been replaced by a configurable GLB environment, currently `amphitheater/amphitheatre.glb`. The scene uses a bright blue sky, warm late-afternoon directional light, hemispheric fill light, and the environment's own floor to avoid overlapping the old grid plane. Change the `environment` object in `source.json` to disable or replace it:
 
 ```json
 "environment": {
   "enabled": true,
   "url": "./amphitheater/amphitheatre.glb",
-  "targetWidth": 120,
+  "targetWidth": 200,
   "rotationY": 0,
   "position": [0, 0, 0]
 }
