@@ -44,7 +44,7 @@
   "environment": {
     "enabled": true,
     "url": "./amphitheater/amphitheatre.glb",
-    "targetWidth": 120,
+    "targetWidth": 200,
     "rotationY": 0,
     "position": [
       0,
