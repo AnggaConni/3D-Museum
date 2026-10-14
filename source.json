@@ -52,10 +52,33 @@
       0
     ]
   },
-  "titleScreen": {
-    "titleLine1": "NEO",
-    "titleLine2": "MUSEUM",
-    "subtitle": "Nyah Lasem Heritage",
-    "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
+  "theme": {
+    "active": "egyptian_tomb",
+    "presets": {
+      "neo_museum": {
+        "label": "NEO Museum",
+        "style": "neo_museum",
+        "titleLine1": "NEO",
+        "titleLine2": "MUSEUM",
+        "subtitle": "Nyah Lasem Heritage",
+        "footerText": "SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"
+      },
+      "egyptian_tomb": {
+        "label": "Egyptian Tomb",
+        "style": "egyptian_tomb",
+        "titleLine1": "EGYPTIAN",
+        "titleLine2": "ARTIFACTS",
+        "subtitle": "Tomb of Ancient Treasures",
+        "footerText": "A JOURNEY INTO ANCIENT EGYPT"
+      },
+      "ich_crafting": {
+        "label": "ICH Crafting",
+        "style": "ich_crafting",
+        "titleLine1": "LIVING",
+        "titleLine2": "CRAFTS",
+        "subtitle": "Intangible Cultural Heritage",
+        "footerText": "TRADITION • KNOWLEDGE • COMMUNITY"
+      }
+    }
   }
 }
