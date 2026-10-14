@@ -276,25 +276,49 @@
             models: []
         };
 
+        function normalizePublishedSheetUrl(rawUrl) {
+            const url = new URL(rawUrl, window.location.href);
+            if (url.protocol !== 'https:' || url.hostname !== 'docs.google.com' ||
+                !/^\/spreadsheets\/d\/e\//i.test(url.pathname)) {
+                throw new Error('Use the Google Sheets Publish to web URL (docs.google.com/spreadsheets/d/e/...).');
+            }
+
+            // Google may copy a published HTML page URL (pubhtml); convert it to the CSV endpoint.
+            if (/\/pubhtml\/?$/i.test(url.pathname)) {
+                url.pathname = url.pathname.replace(/\/pubhtml\/?$/i, '/pub');
+                url.searchParams.delete('embedded');
+            }
+            if (/\/pub\/?$/i.test(url.pathname)) {
+                url.pathname = url.pathname.replace(/\/pub\/?$/i, '/pub');
+                url.searchParams.set('output', 'csv');
+            } else if (!/\/pub\/?$/i.test(url.pathname) && !/\/export$/i.test(url.pathname)) {
+                throw new Error('The published URL must end with /pub or /pubhtml.');
+            }
+            return url.toString();
+        }
+
         async function loadSourceConfig() {
             try {
                 const response = await fetch('./source.json', { cache: 'no-store' });
-                if (!response.ok) throw new Error(`source.json returned HTTP ${response.status}`);
+                if (!response.ok) throw new Error('source.json returned HTTP ' + response.status);
                 const sourceConfig = await response.json();
-                const sheetUrl = (sourceConfig.sheetUrl || '').trim();
-                if (!sheetUrl || sheetUrl.includes('PASTE_YOUR') || !/^https:\/\/docs\.google\.com\/spreadsheets\/d\/e\//i.test(sheetUrl)) {
-                    throw new Error('Enter a published Google Sheets CSV URL in source.json.');
+                const rawSheetUrl = (sourceConfig.sheetUrl || '').trim();
+                if (!rawSheetUrl || rawSheetUrl.includes('PASTE_YOUR')) {
+                    throw new Error('Add the published Google Sheets URL to source.json.');
                 }
-                config.sheetUrl = sheetUrl;
+
+                config.sheetUrl = normalizePublishedSheetUrl(rawSheetUrl);
                 config.sourceName = sourceConfig.sourceName || 'Google Sheets';
                 config.models = Array.isArray(sourceConfig.models) ? sourceConfig.models : [];
+
                 const sourceLink = document.getElementById('sheet-source-url');
                 if (sourceLink) sourceLink.textContent = config.sourceName + ' (published CSV)';
+                console.info('[SOURCE CONFIG] CSV endpoint:', config.sheetUrl);
                 return true;
             } catch (error) {
                 console.error('[SOURCE CONFIG]', error);
                 const bootStatus = document.getElementById('boot-status');
-                if (bootStatus) bootStatus.textContent = 'Configuration error: check source.json';
+                if (bootStatus) bootStatus.textContent = 'Configuration error: ' + error.message;
                 const connText = document.getElementById('connection-text');
                 if (connText) {
                     connText.textContent = 'CONFIGURATION ERROR';
@@ -310,7 +334,6 @@
                 return false;
             }
         }
-
         let state = {
             scene: 'TITLE', 
             currentCategory: null,
@@ -374,95 +397,219 @@
         }
 
         async function loadGoogleSheetData() {
-            const updateUI = (data, source) => {
-                console.log(`[DATA LOADED] Source: ${source}, Count: ${data.length}`);
-                state.allData = data;
-                state.isOffline = (source.includes('OFFLINE'));
-                
-                const btn = document.getElementById('start-btn');
-                if(btn) {
-                    btn.innerText = "ENTER SYSTEM";
-                    btn.disabled = false;
-                    btn.classList.add("animate-pulse");
-                }
-                
-                const connStatus = document.getElementById('connection-status');
-                const connText = document.getElementById('connection-text');
-                const dataDisplay = document.getElementById('data-display');
-                const bootStatus = document.getElementById('boot-status');
-                
-                if (state.isOffline) {
-                    if(connStatus) { connStatus.classList.replace('bg-yellow-500', 'bg-orange-500'); }
-                    if(connText) { connText.innerText = "OFFLINE MODE"; connText.classList.replace('text-yellow-300', 'text-orange-300'); }
-                    if(dataDisplay) { dataDisplay.innerHTML = `<span class="text-orange-400">⚠</span> Demo Data Loaded`; }
-                    if(bootStatus) { bootStatus.innerText = "Network Error. Loaded Offline Backup."; }
-                } else {
-                    if(connStatus) { connStatus.classList.replace('bg-yellow-500', 'bg-green-500'); connStatus.classList.replace('shadow-[0_0_10px_#eab308]', 'shadow-[0_0_10px_#22c55e]'); }
-                    if(connText) { connText.innerText = "LIVE DATA SYNCED"; connText.classList.replace('text-yellow-300', 'text-green-300'); }
-                    if(dataDisplay) { dataDisplay.innerHTML = `<span class="text-green-400">●</span> ${state.allData.length} Artifacts Loaded`; }
-                    if(bootStatus) { bootStatus.innerText = "Satellite Link Established."; }
-                }
+            const btn = document.getElementById('start-btn');
+            const bootStatus = document.getElementById('boot-status');
+            const connText = document.getElementById('connection-text');
+            const connStatus = document.getElementById('connection-status');
+            const dataDisplay = document.getElementById('data-display');
+
+            if (btn) {
+                btn.innerText = 'CONNECTING...';
+                btn.disabled = true;
+            }
+            if (connText) connText.innerText = 'CONNECTING TO DATA SOURCE';
+            if (bootStatus) bootStatus.innerText = 'Preparing published CSV endpoint...';
+
+            const setStatus = (message) => {
+                if (bootStatus) bootStatus.innerText = message;
+                console.info('[DATA SOURCE]', message);
             };
 
-            // STRATEGY: 1. Try Direct Fetch -> 2. Try Proxy -> 3. Load Offline
-            try {
-                // 1. DIRECT FETCH
-                document.getElementById('boot-status').innerText = "Dialing Google Server...";
-                // Add Timestamp to bust cache
-                const url = config.sheetUrl + '&t=' + Date.now();
-                
-                const response = await fetch(url);
-                if (response.ok) {
-                    const csvText = await response.text();
-                    parseCSV(csvText, "LIVE SHEET");
-                    return;
-                }
-            } catch (e) {
-                console.warn("Direct fetch failed, trying proxy...");
-            }
+            const updateUI = (data, sourceName, detail) => {
+                state.allData = Array.isArray(data) ? data : [];
+                state.isOffline = /OFFLINE|DEMO/i.test(sourceName);
 
-            try {
-                // 2. PROXY FETCH (Backup)
-                document.getElementById('boot-status').innerText = "Direct failed. Routing via Proxy...";
-                const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(config.sheetUrl)}`;
-                const response = await fetch(proxyUrl);
-                if (response.ok) {
-                    const csvText = await response.text();
-                    parseCSV(csvText, "PROXY SHEET");
-                    return;
-                }
-            } catch (e) {
-                console.warn("Proxy failed, loading offline...");
-            }
-
-            // 3. OFFLINE FALLBACK
-            updateUI(generateEmergencyData(), "OFFLINE DEMO");
-
-            // Internal Parse Helper
-            function parseCSV(csvText, sourceName) {
-                // Basic validation
-                if(!csvText || csvText.trim().startsWith('<')) {
-                    updateUI(generateEmergencyData(), "OFFLINE (Invalid CSV)");
-                    return;
+                if (btn) {
+                    btn.innerText = 'ENTER SYSTEM';
+                    btn.disabled = false;
+                    btn.classList.add('animate-pulse');
                 }
 
-                Papa.parse(csvText, {
-                    header: true,
-                    skipEmptyLines: true,
-                    complete: function(results) {
-                        if (results.data && results.data.length > 0) {
-                            updateUI(results.data, sourceName);
-                        } else {
-                            updateUI(generateEmergencyData(), "OFFLINE DEMO (Empty)");
-                        }
-                    },
-                    error: function() {
-                         updateUI(generateEmergencyData(), "OFFLINE DEMO (Parse Error)");
+                if (state.isOffline) {
+                    if (connStatus) {
+                        connStatus.classList.replace('bg-yellow-500', 'bg-orange-500');
+                        connStatus.classList.replace('bg-green-500', 'bg-orange-500');
+                        connStatus.classList.remove('shadow-[0_0_10px_#22c55e]');
                     }
-                });
-            }
-        }
+                    if (connText) {
+                        connText.innerText = 'DEMO MODE - SOURCE UNAVAILABLE';
+                        connText.classList.replace('text-yellow-300', 'text-orange-300');
+                        connText.classList.replace('text-green-300', 'text-orange-300');
+                    }
+                    if (dataDisplay) dataDisplay.innerHTML = '<span class="text-orange-400">⚠</span> Demo Data Loaded';
+                    if (bootStatus) bootStatus.innerText = detail || 'Live data could not be loaded; demo data is available.';
+                } else {
+                    if (connStatus) {
+                        connStatus.classList.replace('bg-yellow-500', 'bg-green-500');
+                        connStatus.classList.replace('bg-orange-500', 'bg-green-500');
+                        connStatus.classList.add('shadow-[0_0_10px_#22c55e]');
+                    }
+                    if (connText) {
+                        connText.innerText = 'LIVE DATA SYNCED';
+                        connText.classList.replace('text-yellow-300', 'text-green-300');
+                        connText.classList.replace('text-orange-300', 'text-green-300');
+                    }
+                    if (dataDisplay) dataDisplay.innerHTML = '<span class="text-green-400">●</span> ' + state.allData.length + ' Artifacts Ready';
+                    if (bootStatus) bootStatus.innerText = detail || ('Loaded ' + state.allData.length + ' records from ' + sourceName + '.');
+                }
 
+                console.info('[DATA LOADED] Source:', sourceName, 'Count:', state.allData.length);
+            };
+
+            const withCacheBuster = (rawUrl) => {
+                const url = new URL(rawUrl);
+                url.searchParams.set('_ts', String(Date.now()));
+                return url.toString();
+            };
+
+            async function fetchTextWithTimeout(url, timeoutMs) {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+                try {
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        cache: 'no-store',
+                        signal: controller.signal
+                    });
+                    if (!response.ok) throw new Error('HTTP ' + response.status);
+                    const text = await response.text();
+                    if (!text || !text.trim()) throw new Error('The endpoint returned an empty response.');
+                    return text;
+                } catch (error) {
+                    if (error && error.name === 'AbortError') {
+                        throw new Error('Request timed out after ' + Math.round(timeoutMs / 1000) + ' seconds.');
+                    }
+                    throw error;
+                } finally {
+                    clearTimeout(timeoutId);
+                }
+            }
+
+            // Native fallback parser is used only if the PapaParse CDN is unavailable.
+            function parseCsvFallback(csvText) {
+                const rows = [];
+                let row = [];
+                let field = '';
+                let quoted = false;
+
+                for (let i = 0; i < csvText.length; i++) {
+                    const char = csvText[i];
+                    if (char === '"') {
+                        if (quoted && csvText[i + 1] === '"') {
+                            field += '"';
+                            i++;
+                        } else {
+                            quoted = !quoted;
+                        }
+                    } else if (char === ',' && !quoted) {
+                        row.push(field); field = '';
+                    } else if ((char === '\n' || char === '\r') && !quoted) {
+                        if (char === '\r' && csvText[i + 1] === '\n') i++;
+                        row.push(field);
+                        if (row.some(value => String(value).trim() !== '')) rows.push(row);
+                        row = []; field = '';
+                    } else {
+                        field += char;
+                    }
+                }
+                row.push(field);
+                if (row.some(value => String(value).trim() !== '')) rows.push(row);
+                if (rows.length < 2) throw new Error('CSV contains a header but no data rows.');
+
+                const headers = rows.shift().map((value, index) =>
+                    String(value || '').replace(/^\uFEFF/, '').trim() || ('column_' + index)
+                );
+                return {
+                    fields: headers,
+                    data: rows.map(values => {
+                        const record = {};
+                        headers.forEach((header, index) => { record[header] = String(values[index] || '').trim(); });
+                        return record;
+                    }),
+                    errors: []
+                };
+            }
+
+            function parseAndValidateCsv(rawText) {
+                const csvText = String(rawText || '').replace(/^\uFEFF/, '').trim();
+                if (!csvText) throw new Error('Response is empty.');
+                if (/^(<!doctype\s+html|<html|<head|<body|<script|google\.visualization)/i.test(csvText)) {
+                    throw new Error('The endpoint returned HTML/JavaScript instead of CSV. Check the Publish to web CSV URL.');
+                }
+                if (typeof window.Papa === 'undefined' || typeof window.Papa.parse !== 'function') {
+                    console.warn('[CSV] PapaParse CDN unavailable; using the built-in CSV parser.');
+                }
+
+                let parsed;
+                if (typeof window.Papa !== 'undefined' && typeof window.Papa.parse === 'function') {
+                    parsed = window.Papa.parse(csvText, {
+                        header: true,
+                        skipEmptyLines: 'greedy',
+                        transformHeader: header => String(header || '').replace(/^\uFEFF/, '').trim(),
+                        transform: value => typeof value === 'string' ? value.trim() : value
+                    });
+                } else {
+                    parsed = parseCsvFallback(csvText);
+                }
+
+                const rows = (parsed.data || []).filter(record =>
+                    record && Object.values(record).some(value => String(value == null ? '' : value).trim() !== '')
+                );
+                const fields = (parsed.meta && parsed.meta.fields ? parsed.meta.fields : parsed.fields || [])
+                    .map(field => String(field || '').trim().toLowerCase());
+
+                const hasCategory = fields.some(field => ['category', 'kategori', 'cat'].includes(field));
+                const hasTitle = fields.some(field => ['title', 'nama', 'name', 'judul'].includes(field));
+                if (!hasCategory) throw new Error('CSV header is missing a category/kategori column.');
+                if (!hasTitle) throw new Error('CSV header is missing a title/nama/name/judul column.');
+                if (!rows.length) throw new Error('CSV parsed successfully but contains no records.');
+
+                const categoryKey = fields.find(field => ['category', 'kategori', 'cat'].includes(field));
+                const knownCategories = new Set(['underwater', 'ancient_craft', 'museum']);
+                const categoryValues = rows.map(record => {
+                    const key = Object.keys(record).find(name => name.trim().toLowerCase() === categoryKey);
+                    return key ? String(record[key] || '').trim().toLowerCase() : '';
+                }).filter(Boolean);
+                const matchingCategories = categoryValues.filter(value => knownCategories.has(value));
+                if (!matchingCategories.length) {
+                    throw new Error('CSV parsed, but no rows use the configured categories: underwater, ancient_craft, museum.');
+                }
+
+                if (parsed.errors && parsed.errors.length) {
+                    console.warn('[CSV] PapaParse warnings:', parsed.errors.slice(0, 5));
+                }
+                return rows;
+            }
+
+            const csvUrl = withCacheBuster(config.sheetUrl);
+            const attempts = [
+                { label: 'Google Sheets CSV', url: csvUrl, timeout: 7000 },
+                { label: 'AllOrigins proxy', url: 'https://api.allorigins.win/raw?url=' + encodeURIComponent(csvUrl), timeout: 6500 },
+                { label: 'Codetabs proxy', url: 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(csvUrl), timeout: 6500 }
+            ];
+            const errors = [];
+
+            for (const attempt of attempts) {
+                setStatus('Trying ' + attempt.label + '...');
+                try {
+                    const csvText = await fetchTextWithTimeout(attempt.url, attempt.timeout);
+                    const data = parseAndValidateCsv(csvText);
+                    updateUI(data, attempt.label, 'Connected via ' + attempt.label + '. Loaded ' + data.length + ' records.');
+                    return;
+                } catch (error) {
+                    const message = error && error.message ? error.message : String(error);
+                    errors.push(attempt.label + ': ' + message);
+                    console.warn('[DATA SOURCE FAILED] ' + attempt.label + ':', error);
+                }
+            }
+
+            const diagnosis = errors.length ? errors[errors.length - 1] : 'No source was available.';
+            updateUI(
+                generateEmergencyData(),
+                'OFFLINE DEMO',
+                'Live data unavailable. ' + diagnosis + ' Open DevTools Console for all source attempts.'
+            );
+        }
         // --- HELPER: CONVERT DRIVE LINK TO DIRECT IMAGE (IMPROVED) ---
         function getDirectDriveUrl(url) {
             if (!url) return "";
