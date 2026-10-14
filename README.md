@@ -50,10 +50,34 @@ Create a Google Sheet and keep the column headers in the first row. The core fie
 | <code>title</code> | Yes | <code>Traditional Fishing Boat</code> |
 | <code>description</code> | Optional | A short description of the object |
 | <code>category</code> | Yes | <code>museum</code>, <code>underwater</code>, or <code>ancient_craft</code> |
-| <code>image_url</code> | Optional | A publicly accessible image URL |
+| <code>image_url</code> | Optional | One public image URL (older sheets still work) |
+| <code>image_urls</code> | Optional | Multiple image URLs separated by <code> \| </code> |
+| <code>image_url_1</code>, <code>image_url_2</code>, ... | Optional | One image URL per column |
 | <code>year</code> | Optional | <code>1950</code> |
 
 Aliases such as <code>nama</code>, <code>judul</code>, <code>kategori</code>, <code>gambar</code>, <code>deskripsi</code>, and <code>tahun</code> are also supported.
+
+### Add more than one image
+
+The easiest option is an <code>image_urls</code> column. Paste public image links in one cell and separate them with a vertical bar (<code>|</code>), like this:
+
+<pre><code>https://example.org/photo-front.jpg | https://example.org/photo-side.jpg | https://example.org/photo-detail.jpg</code></pre>
+
+You can keep using <code>image_url</code> for one image, or create separate columns named <code>image_url_1</code>, <code>image_url_2</code>, and <code>image_url_3</code>. The artefact window shows the available pictures as a carousel. Use the arrow buttons to browse and **View full screen** to enlarge a picture. Use image URLs that visitors can open without logging in.
+
+### Format descriptions with bold text, tables, and links
+
+The <code>description</code> cell accepts plain text or a small, safe set of HTML tags. For example, copy this as text into a spreadsheet cell, then replace the sample words and link:
+
+<pre><code>&lt;p&gt;&lt;strong&gt;Origin:&lt;/strong&gt; Wae Rebo, Flores.&lt;/p&gt;
+&lt;p&gt;This traditional house represents local knowledge.
+&lt;a href="https://example.org/heritage"&gt;Read more&lt;/a&gt;&lt;/p&gt;
+&lt;table&gt;
+  &lt;tr&gt;&lt;th&gt;Feature&lt;/th&gt;&lt;th&gt;Meaning&lt;/th&gt;&lt;/tr&gt;
+  &lt;tr&gt;&lt;td&gt;Roof&lt;/td&gt;&lt;td&gt;Community identity&lt;/td&gt;&lt;/tr&gt;
+&lt;/table&gt;</code></pre>
+
+Supported formatting includes paragraphs, **bold**, *italic*, headings, lists, blockquotes, simple tables, inline code, and links. Links open in a new tab. The site rebuilds descriptions from an allowlist of tags and safe link addresses. Script tags, event handlers, embedded frames, and unsafe link schemes are discarded rather than executed.
 
 ### Publish the sheet as CSV
 
@@ -175,6 +199,7 @@ The environment is configured separately:
 - PapaParse handles CSV parsing, with a small built-in parser as a fallback if the PapaParse CDN is unavailable.
 - The data loader checks required headers and expected categories, tries the published CSV directly, then attempts public proxy fallbacks with timeouts.
 - Three.js and GLTFLoader render the 3D models. GSAP powers animations, and OrbitControls provides camera interaction.
+- Catalogue images support a carousel and a dedicated full-screen viewer. Descriptions support a safe HTML subset for bold text, links, lists, and tables.
 - GitHub Pages serves the static files.
 
 ## Technologies and dependencies
