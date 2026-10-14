@@ -672,6 +672,10 @@
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            // Correct output color space plus tone mapping prevents white GLB materials from clipping.
+            renderer.outputEncoding = THREE.sRGBEncoding;
+            renderer.toneMapping = THREE.ACESFilmicToneMapping;
+            renderer.toneMappingExposure = 0.9;
             renderer.shadowMap.enabled = true;
             renderer.shadowMap.type = THREE.PCFSoftShadowMap;
             container.appendChild(renderer.domElement);
@@ -770,15 +774,15 @@
 
             // Clear bright-blue sky with warm late-afternoon sunlight.
             scene.background.setHex(0x78bdf5);
-            scene.fog = new THREE.FogExp2(0xb7dcf6, 0.0015);
-            dirLight.color.setHex(0xffe2b5);
+            scene.fog = new THREE.FogExp2(0xb7dcf6, 0.001);
+            dirLight.color.setHex(0xffdfb0);
             dirLight.position.set(-30, 70, 20);
-            dirLight.intensity = 2.0;
-            ambientLight.intensity = 1.15;
+            dirLight.intensity = 1.05;
+            ambientLight.intensity = 0.45;
             if (hemiLight) {
                 hemiLight.color.setHex(0x8bcfff);
-                hemiLight.groundColor.setHex(0xc9b18d);
-                hemiLight.intensity = 1.1;
+                hemiLight.groundColor.setHex(0xb8a080);
+                hemiLight.intensity = 0.5;
             }
             controls.enabled = true; controls.enableZoom = false; controls.enablePan = false;
             controls.maxPolarAngle = Math.PI / 2.2; controls.minPolarAngle = Math.PI / 4;
