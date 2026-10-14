@@ -182,15 +182,15 @@
             <div class="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-cyan-400"></div>
             <div class="absolute bottom-0 right-0 w-4 h-4 border-b-2 border-r-2 border-cyan-400"></div>
 
-            <h1 class="text-6xl md:text-8xl font-bold mb-2 cyber-title tracking-tighter">NEO<br>MUSEUM</h1>
-            <p class="text-cyan-400 text-xl mb-8 font-[Rajdhani] tracking-[0.5em] uppercase">Nyah Lasem Heritage</p>
+            <h1 class="text-6xl md:text-8xl font-bold mb-2 cyber-title tracking-tighter"><span id="title-line-1">NEO</span><br id="title-line-break"><span id="title-line-2">MUSEUM</span></h1>
+            <p id="title-subtitle" class="text-cyan-400 text-xl mb-8 font-[Rajdhani] tracking-[0.5em] uppercase">Nyah Lasem Heritage</p>
             
             <button onclick="startGame()" id="start-btn" class="cyber-btn px-10 py-4 font-bold text-lg rounded-sm group disabled:opacity-50 disabled:cursor-not-allowed">
                 CONNECTING...
             </button>
             <p id="boot-status" class="text-xs text-gray-500 mt-2 font-mono">Attempting Satellite Link...</p>
         </div>
-        <p class="absolute bottom-10 text-slate-600 text-sm font-mono border-t border-slate-800 pt-2">
+        <p id="title-footer" class="absolute bottom-10 text-slate-600 text-sm font-mono border-t border-slate-800 pt-2">
             SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026
         </p>
     </div>
@@ -273,7 +273,9 @@
             accentColor: 0x06b6d4,
             sheetUrl: '',
             sourceName: 'Google Sheets',
-            models: []
+            models: [],
+            environment: null,
+            titleScreen: {}
         };
 
         function normalizePublishedSheetUrl(rawUrl) {
@@ -311,6 +313,34 @@
                 config.sourceName = sourceConfig.sourceName || 'Google Sheets';
                 config.models = Array.isArray(sourceConfig.models) ? sourceConfig.models : [];
                 config.environment = sourceConfig.environment || null;
+                config.titleScreen = sourceConfig.titleScreen && typeof sourceConfig.titleScreen === 'object'
+                    ? sourceConfig.titleScreen : {};
+
+                // Use textContent for configuration strings so branding remains plain text, not injected HTML.
+                const titleScreen = config.titleScreen;
+                const titleLine1 = document.getElementById('title-line-1');
+                const titleLine2 = document.getElementById('title-line-2');
+                const titleLineBreak = document.getElementById('title-line-break');
+                const subtitleEl = document.getElementById('title-subtitle');
+                const footerEl = document.getElementById('title-footer');
+                const line1Text = typeof titleScreen.titleLine1 === 'string' ? titleScreen.titleLine1 : 'NEO';
+                const line2Text = typeof titleScreen.titleLine2 === 'string' ? titleScreen.titleLine2 : 'MUSEUM';
+                const subtitleText = typeof titleScreen.subtitle === 'string' ? titleScreen.subtitle : 'Nyah Lasem Heritage';
+                const footerText = typeof titleScreen.footerText === 'string'
+                    ? titleScreen.footerText : 'SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026';
+
+                if (titleLine1) titleLine1.textContent = line1Text;
+                if (titleLine2) titleLine2.textContent = line2Text;
+                if (titleLineBreak) titleLineBreak.style.display = line2Text ? '' : 'none';
+                if (titleLine2) titleLine2.style.display = line2Text ? '' : 'none';
+                if (subtitleEl) {
+                    subtitleEl.textContent = subtitleText;
+                    subtitleEl.style.display = subtitleText ? '' : 'none';
+                }
+                if (footerEl) {
+                    footerEl.textContent = footerText;
+                    footerEl.style.display = footerText ? '' : 'none';
+                }
 
                 const sourceLink = document.getElementById('sheet-source-url');
                 if (sourceLink) sourceLink.textContent = config.sourceName + ' (published CSV)';
