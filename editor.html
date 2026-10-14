@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#101a20">
+<meta name="description" content="Free visual editor for 3D Museum source.json. Configure a collection, themes, models and environment, then export JSON.">
+<title>3D Museum — JSON Editor</title>
+<style>
+:root{color-scheme:dark;--bg:#0a1116;--panel:#111c22;--panel2:#17252b;--line:#2b4147;--text:#edf5f1;--muted:#a1b4b1;--gold:#d9b56d;--mint:#8fc9a7;--danger:#f1a69c;--blue:#8acbe4}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 10% 0%,#19312e 0,transparent 38%),var(--bg);color:var(--text);font:15px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:var(--blue)}button,input,select,textarea{font:inherit}button{cursor:pointer}.shell{width:min(1180px,calc(100% - 32px));margin:0 auto;padding:28px 0 55px}
+header{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:22px}.brand{display:flex;gap:13px;align-items:center}.brandmark{display:grid;place-items:center;width:46px;height:46px;border:1px solid var(--gold);color:var(--gold);font-weight:900;border-radius:12px;background:#202721;letter-spacing:-2px}h1,h2,h3,p{margin-top:0}h1{margin-bottom:5px;font-size:clamp(1.55rem,3vw,2.25rem);letter-spacing:-.04em}h2{font-size:1.13rem;margin-bottom:5px}h3{font-size:1rem}.eyebrow{color:var(--gold);text-transform:uppercase;letter-spacing:.16em;font-size:.74rem;font-weight:800}.lead,.muted,.help{color:var(--muted)}.lead{max-width:780px;margin:0}.top-actions,.actions{display:flex;gap:9px;flex-wrap:wrap;align-items:center}.button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border-radius:9px;border:1px solid #496068;padding:10px 14px;background:#1a292f;color:var(--text);font-weight:700;text-decoration:none}.button:hover{filter:brightness(1.13)}.button.primary{background:var(--gold);color:#211a0e;border-color:var(--gold)}.button.secondary{background:var(--panel2)}.button.danger{color:#ffd6d1;border-color:#784b48;background:#321f20}.button.big{font-size:1rem;padding:14px 18px;min-height:48px}.file-button{position:relative;overflow:hidden}.file-button input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.notice{margin:20px 0;padding:13px 15px;border-radius:10px;border:1px solid #49615b;background:rgba(25,49,42,.62);color:#d6e8dd}.status{display:flex;gap:10px;align-items:flex-start;margin:0 0 18px;padding:11px 13px;background:#111c22;border:1px solid var(--line);border-radius:9px;color:var(--muted)}.status.good{border-color:#3e7958;color:#bfe7ca}.status.warn{border-color:#8c7140;color:#f1d7a2}.status.bad{border-color:#824d4a;color:#ffc5bf}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(310px,.85fr);gap:18px;align-items:start}.column{display:grid;gap:16px}.card{background:rgba(17,28,34,.94);border:1px solid var(--line);border-radius:14px;padding:19px;box-shadow:0 14px 35px rgba(0,0,0,.12)}.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}.card-head p{margin:0;color:var(--muted);font-size:.88rem}.field{display:grid;gap:6px;min-width:0;margin-bottom:13px}.field:last-child{margin-bottom:0}label,.field-label{color:#d8e7e3;font-size:.87rem;font-weight:700}input[type=text],input[type=url],input[type=number],select,textarea{width:100%;padding:10px 11px;border-radius:8px;border:1px solid #3a5158;background:#091217;color:var(--text);outline:none;min-width:0}input:focus,select:focus,textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(217,181,109,.12)}input[type=checkbox]{accent-color:var(--mint);width:17px;height:17px}.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.grid3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.checkline{display:flex;align-items:center;gap:9px}.help{font-size:.78rem;line-height:1.45;margin:0}.pill{font-size:.72rem;padding:3px 8px;border-radius:99px;color:var(--mint);border:1px solid #426d56;white-space:nowrap}.pill.off{color:#d7c39d;border-color:#806e4c}.model-card{border:1px solid #354a50;background:#0c171c;border-radius:10px;padding:13px;margin-bottom:10px}.model-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}.model-title{font-weight:800}.model-grid{display:grid;grid-template-columns:1fr 1.2fr;gap:10px}.json-preview{position:sticky;top:14px}textarea#json-output{height:430px;resize:vertical;font:12px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace;white-space:pre;tab-size:2}.validation{padding:12px 13px;border:1px solid var(--line);border-radius:9px;margin:12px 0;color:var(--muted);font-size:.85rem}.validation div{margin:4px 0}.validation .ok{color:#9cdbb0}.validation .warn{color:#f0ce88}.validation .error{color:#ffb5af}.footer-note{margin-top:22px;color:var(--muted);font-size:.82rem;text-align:center}
+@media(max-width:850px){.layout{grid-template-columns:1fr}.json-preview{position:static}textarea#json-output{height:300px}header{align-items:flex-start;flex-direction:column}}@media(max-width:520px){.shell{width:min(100% - 20px,1180px);padding-top:18px}.card{padding:14px}.grid2,.grid3,.model-grid{grid-template-columns:1fr}.top-actions,.actions{width:100%}.top-actions .button,.actions .button{flex:1}}
+</style>
+</head>
+<body>
+<div class="shell">
+<header>
+  <div class="brand"><div class="brandmark">3D</div><div><div class="eyebrow">Open-source configuration tool</div><h1>Museum JSON Editor</h1><p class="lead">Configure your collection, title theme, 3D models and environment. Export a valid <code>source.json</code> without editing application code.</p></div></div>
+  <div class="top-actions"><button class="button secondary" id="load-site">↻ Load site config</button><label class="button secondary file-button">⇧ Import JSON<input type="file" id="import-file" accept=".json,application/json"></label></div>
+</header>
+<div class="notice"><strong>Safe by design:</strong> runs entirely in your browser. No backend, database, GitHub token, or sign-in is needed. Changes are not published automatically; export the file and replace <code>source.json</code> yourself.</div>
+<div id="status" class="status" role="status">Loading configuration…</div>
+<div class="layout">
+<main class="column">
+<section class="card">
+  <div class="card-head"><div><h2>01 · Collection source</h2><p>Where the museum reads its collection data.</p></div><span class="pill">Google Sheets</span></div>
+  <div class="field"><label for="source-name">Collection name</label><input type="text" id="source-name" data-field="sourceName" placeholder="My museum collection"></div>
+  <div class="field"><label for="sheet-url">Published Google Sheets CSV URL</label><input type="url" id="sheet-url" data-field="sheetUrl" placeholder="https://docs.google.com/spreadsheets/d/e/.../pub?output=csv"><p class="help">Publish the chosen sheet/tab to the web as CSV. A normal sharing link is not the same as a published CSV link.</p></div>
+</section>
+<section class="card">
+  <div class="card-head"><div><h2>02 · Opening theme</h2><p>Choose a title-screen look and customize its copy.</p></div></div>
+  <div class="field"><label for="active-theme">Active theme</label><select id="active-theme"></select><p class="help">Built-in styles: <code>egyptian_tomb</code>, <code>ich_crafting</code>, <code>neo_museum</code>.</p></div>
+  <div class="grid2"><div class="field"><label for="theme-line-1">Title line 1</label><input type="text" id="theme-line-1" data-theme-field="titleLine1"></div><div class="field"><label for="theme-line-2">Title line 2</label><input type="text" id="theme-line-2" data-theme-field="titleLine2"></div></div>
+  <div class="field"><label for="theme-subtitle">Subtitle</label><input type="text" id="theme-subtitle" data-theme-field="subtitle"></div>
+  <div class="field"><label for="theme-footer">Footer text</label><input type="text" id="theme-footer" data-theme-field="footerText"></div>
+  <div class="field"><label for="theme-style">Visual style</label><select id="theme-style" data-theme-field="style"><option value="egyptian_tomb">Egyptian Tomb · limestone & gold</option><option value="ich_crafting">ICH Crafting · woven & botanical</option><option value="neo_museum">NEO Museum · cyberpunk neon</option></select><p class="help">The style selects one of the built-in CSS designs. Text edits are stored in the selected preset in JSON.</p></div>
+</section>
+<section class="card">
+  <div class="card-head"><div><h2>03 · Category models</h2><p>Change model paths, target sizes and enabled status.</p></div><button class="button secondary" id="add-model">＋ Add model</button></div>
+  <div id="models-list"></div>
+  <p class="help">The current scene has three category slots: <code>underwater</code>, <code>ancient_craft</code>, and <code>museum</code>. An extra model can be configured here, but a new category also needs a matching scene slot in <code>index.html</code>.</p>
+</section>
+<section class="card">
+  <div class="card-head"><div><h2>04 · 3D environment</h2><p>Configure the surrounding GLB scene.</p></div></div>
+  <div class="field"><label class="checkline"><input type="checkbox" id="environment-enabled" data-env-field="enabled"> Enable environment model</label></div>
+  <div class="field"><label for="environment-url">Environment GLB path or URL</label><input type="text" id="environment-url" data-env-field="url" placeholder="./amphitheater/amphitheatre.glb"></div>
+  <div class="grid2"><div class="field"><label for="environment-width">Target width</label><input type="number" min="1" step="1" id="environment-width" data-env-field="targetWidth"></div><div class="field"><label for="environment-rotation">Rotation Y (degrees)</label><input type="number" step="1" id="environment-rotation" data-env-field="rotationY"></div></div>
+  <div class="field"><span class="field-label">Position offset (X / Y / Z)</span><div class="grid3"><input type="number" step="0.5" aria-label="Environment position X" data-position-index="0"><input type="number" step="0.5" aria-label="Environment position Y" data-position-index="1"><input type="number" step="0.5" aria-label="Environment position Z" data-position-index="2"></div></div>
+  <p class="help">Width scales the environment proportionally. Position is applied after centering and ground alignment.</p>
+</section>
+</main>
+<aside class="column">
+<section class="card json-preview">
+  <div class="card-head"><div><h2>05 · Export configuration</h2><p>Review the generated JSON, then download it as <code>source.json</code>.</p></div><span class="pill">No backend</span></div>
+  <div id="validation" class="validation"></div>
+  <div class="field"><label for="json-output">Generated source.json</label><textarea id="json-output" spellcheck="false" readonly></textarea></div>
+  <div class="actions"><button class="button primary big" id="download-json">↓ Download source.json</button><button class="button secondary big" id="copy-json">Copy JSON</button></div>
+  <div class="actions" style="margin-top:9px"><button class="button secondary" id="reset-sample">Reset to starter config</button></div>
+  <p class="help" style="margin-top:12px">Exporting does not change GitHub. After downloading, open your repository → <code>source.json</code> → Edit (pencil) → replace the contents → Commit changes.</p>
+</section>
+</aside>
+</div>
+<p class="footer-note">3D Museum · GPL-3.0-only · Static browser tool · No telemetry or account required</p>
+</div>
+<script>
+(function(){
+'use strict';
+const DEFAULT_CONFIG={
+  "_instructions":"Replace sheetUrl with your published Google Sheets CSV URL. Keep source.json beside index.html.",
+  "sourceName":"My Museum Collection",
+  "sheetUrl":"https://docs.google.com/spreadsheets/d/e/YOUR_PUBLISHED_ID/pub?output=csv",
+  "models":[
+    {"id":"shipwreck","category":"underwater","enabled":true,"url":"./models/shipwreck.glb","targetSize":8},
+    {"id":"african-hut","category":"ancient_craft","enabled":true,"url":"./models/african%20hut.glb","targetSize":8},
+    {"id":"museum","category":"museum","enabled":true,"url":"./models/museum.glb","targetSize":8},
+    {"id":"artifact","category":null,"enabled":false,"url":"./models/artifact.glb","targetSize":8},
+    {"id":"statue","category":null,"enabled":false,"url":"./models/statue.glb","targetSize":8}
+  ],
+  "environment":{"enabled":true,"url":"./amphitheater/amphitheatre.glb","targetWidth":270,"rotationY":0,"position":[0,0,0]},
+  "theme":{"active":"egyptian_tomb","presets":{
+    "neo_museum":{"label":"NEO Museum","style":"neo_museum","titleLine1":"NEO","titleLine2":"MUSEUM","subtitle":"Nyah Lasem Heritage","footerText":"SYSTEM ARCHITECT: ANGGA CONNI SAPUTRA // BUILD 2026"},
+    "egyptian_tomb":{"label":"Egyptian Tomb","style":"egyptian_tomb","titleLine1":"EGYPTIAN","titleLine2":"ARTIFACTS","subtitle":"Tomb of Ancient Treasures","footerText":"A JOURNEY INTO ANCIENT EGYPT"},
+    "ich_crafting":{"label":"ICH Crafting","style":"ich_crafting","titleLine1":"LIVING","titleLine2":"CRAFTS","subtitle":"Intangible Cultural Heritage","footerText":"TRADITION • KNOWLEDGE • COMMUNITY"}
+  }}
+};
+let config=clone(DEFAULT_CONFIG);
+const $=function(id){return document.getElementById(id);};
+function clone(v){return JSON.parse(JSON.stringify(v));}
+function esc(v){return String(v==null?'':v).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function normalize(raw){
+  if(!raw||typeof raw!=='object'||Array.isArray(raw))throw new Error('The JSON root must be an object.');
+  const incoming=clone(raw), base=clone(DEFAULT_CONFIG), merged=Object.assign(base,incoming);
+  merged.models=(Array.isArray(incoming.models)?incoming.models:clone(DEFAULT_CONFIG.models)).map(function(m,i){
+    const item=Object.assign({id:'model-'+(i+1),category:null,enabled:false,url:'',targetSize:8},m||{});
+    if(item.category==='')item.category=null;item.enabled=item.enabled===true;item.targetSize=Number(item.targetSize)||8;return item;
+  });
+  merged.environment=Object.assign({},clone(DEFAULT_CONFIG.environment),incoming.environment||{});
+  const oldTheme=incoming.theme&&typeof incoming.theme==='object'?incoming.theme:{};
+  merged.theme=Object.assign({},clone(DEFAULT_CONFIG.theme),oldTheme);
+  merged.theme.presets=Object.assign({},clone(DEFAULT_CONFIG.theme.presets),oldTheme.presets||{});
+  if(incoming.titleScreen&&typeof incoming.titleScreen==='object'&&!incoming.theme){
+    merged.theme.presets.neo_museum=Object.assign({},merged.theme.presets.neo_museum,{
+      titleLine1:incoming.titleScreen.titleLine1||'NEO',titleLine2:incoming.titleScreen.titleLine2||'MUSEUM',
+      subtitle:incoming.titleScreen.subtitle||'',footerText:incoming.titleScreen.footerText||''
+    });
+  }
+  if(!merged.theme.presets[merged.theme.active])merged.theme.active='egyptian_tomb';
+  if(!Array.isArray(merged.environment.position))merged.environment.position=[0,0,0];
+  while(merged.environment.position.length<3)merged.environment.position.push(0);
+  return merged;
+}
+function status(message,type){$('status').className='status'+(type?' '+type:'');$('status').textContent=message;}
+function preset(){return config.theme.presets[config.theme.active]||config.theme.presets.egyptian_tomb;}
+function setConfig(raw,message){config=normalize(raw);renderAll();status(message||'Configuration loaded. Changes are local until you export the JSON.','good');}
+async function loadSiteConfig(){
+  try{const r=await fetch('./source.json?_editor='+Date.now(),{cache:'no-store'});if(!r.ok)throw new Error('HTTP '+r.status);setConfig(await r.json(),'Loaded source.json from this website. Edit fields and export when ready.');}
+  catch(e){renderAll();status('Could not auto-load ./source.json ('+e.message+'). Use Import JSON or start with the sample configuration.','warn');}
+}
+function renderTheme(){
+  const select=$('active-theme');select.innerHTML='';
+  Object.keys(config.theme.presets).forEach(function(k){const o=document.createElement('option');o.value=k;o.textContent=(config.theme.presets[k].label||k)+' ('+k+')';select.appendChild(o);});
+  select.value=config.theme.active;
+  const p=preset();$('theme-line-1').value=p.titleLine1||'';$('theme-line-2').value=p.titleLine2||'';
+  $('theme-subtitle').value=p.subtitle||'';$('theme-footer').value=p.footerText||'';
+  $('theme-style').value=p.style||'neo_museum';
+}
+function renderModels(){
+  const wrap=$('models-list');wrap.innerHTML='';
+  if(!config.models.length){wrap.innerHTML='<p class="help">No models configured. Use “Add model”.</p>';return;}
+  config.models.forEach(function(m,i){
+    const cat=m.category==null?'':String(m.category);
+    const cats=[{v:'',t:'Unassigned / disabled'},{v:'underwater',t:'Underwater Heritage'},{v:'ancient_craft',t:'ICH / Ancient Craft'},{v:'museum',t:'Museum'}];
+    if(cat&&!cats.some(function(x){return x.v===cat;}))cats.push({v:cat,t:cat+' (custom)'});
+    const opts=cats.map(function(x){return '<option value="'+esc(x.v)+'"'+(x.v===cat?' selected':'')+'>'+esc(x.t)+'</option>';}).join('');
+    wrap.insertAdjacentHTML('beforeend','<div class="model-card"><div class="model-top"><div class="model-title">'+esc(m.id||('Model '+(i+1)))+'</div><span class="pill '+(m.enabled?'':'off')+'">'+(m.enabled?'ENABLED':'DISABLED')+'</span></div>'+
+      '<div class="field"><label class="checkline"><input type="checkbox" data-mf="enabled" data-mi="'+i+'"'+(m.enabled?' checked':'')+'> Enable this model</label></div>'+
+      '<div class="model-grid"><div class="field"><label>Model ID</label><input type="text" data-mf="id" data-mi="'+i+'" value="'+esc(m.id)+'"></div><div class="field"><label>Category ID</label><select data-mf="category" data-mi="'+i+'">'+opts+'</select></div></div>'+
+      '<div class="field"><label>GLB path or URL</label><input type="text" data-mf="url" data-mi="'+i+'" value="'+esc(m.url)+'" placeholder="./models/model.glb"></div>'+
+      '<div class="field"><label>Target size (scene units)</label><input type="number" min="0.1" step="0.5" data-mf="targetSize" data-mi="'+i+'" value="'+esc(m.targetSize)+'"></div>'+
+      '<button class="button danger" type="button" data-remove="'+i+'">Remove model</button></div>');
+  });
+}
+function renderEnv(){
+ const e=config.environment;$('environment-enabled').checked=e.enabled!==false;$('environment-url').value=e.url||'';
+ $('environment-width').value=Number(e.targetWidth)||270;$('environment-rotation').value=Number(e.rotationY)||0;
+ for(let i=0;i<3;i++)document.querySelector('[data-position-index="'+i+'"]').value=Number(e.position[i])||0;
+}
+function renderAll(){$('source-name').value=config.sourceName||'';$('sheet-url').value=config.sheetUrl||'';renderTheme();renderModels();renderEnv();output();}
+function validate(){
+ const errors=[],warnings=[],url=String(config.sheetUrl||'').trim();
+ if(!url||url.indexOf('YOUR_PUBLISHED_ID')>=0)warnings.push('Add your published Google Sheets CSV URL before deploying your own catalogue.');
+ else if(!/^https:\/\/docs\.google\.com\/spreadsheets\/d\/e\//i.test(url))errors.push('Use a published Google Sheets URL under docs.google.com/spreadsheets/d/e/.');
+ if(!config.theme.presets[config.theme.active])errors.push('The active theme key does not exist in theme.presets.');
+ const styles=['neo_museum','egyptian_tomb','ich_crafting'];
+ Object.keys(config.theme.presets).forEach(function(k){const p=config.theme.presets[k]||{};if(p.style&&styles.indexOf(p.style)<0)warnings.push('Theme '+k+' uses an unknown visual style.');});
+ const enabled=config.models.filter(function(m){return m.enabled;});
+ enabled.forEach(function(m){if(!String(m.url||'').trim())errors.push('Enabled model '+(m.id||'(unnamed)')+' has no GLB path.');
+   if(m.category==null)warnings.push('Model '+(m.id||'(unnamed)')+' is enabled but unassigned to a category.');
+   if(m.category&&!['underwater','ancient_craft','museum'].includes(m.category))warnings.push('Model '+m.id+' uses a custom category; a map slot is required in index.html.');});
+ ['underwater','ancient_craft','museum'].forEach(function(cat){if(!enabled.some(function(m){return m.category===cat;}))warnings.push('No enabled model maps to '+cat+'.');});
+ return {errors:errors,warnings:warnings};
+}
+function output(){
+ $('json-output').value=JSON.stringify(config,null,2);
+ const v=validate(),wrap=$('validation'),items=[];
+ if(!v.errors.length)items.push('<div class="ok"><strong>✓ JSON structure is valid.</strong></div>');
+ v.errors.forEach(function(t){items.push('<div class="error">Error: '+esc(t)+'</div>');});
+ v.warnings.forEach(function(t){items.push('<div class="warn">Note: '+esc(t)+'</div>');});
+ if(!v.errors.length&&!v.warnings.length)items.push('<div class="ok">All basic checks passed.</div>');
+ wrap.innerHTML=items.join('');return v;
+}
+function download(){
+ const v=output();if(v.errors.length){status('Correct the validation errors before export.','bad');return;}
+ const blob=new Blob([JSON.stringify(config,null,2)+'\n'],{type:'application/json;charset=utf-8'}),url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download='source.json';document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(url);},1000);
+ status('Exported source.json. Replace the repository file manually, then commit the change.','good');
+}
+async function copy(){
+ $('json-output').value=JSON.stringify(config,null,2);
+ try{await navigator.clipboard.writeText($('json-output').value);status('JSON copied to clipboard.','good');}
+ catch(e){$('json-output').focus();$('json-output').select();const ok=document.execCommand('copy');status(ok?'JSON copied to clipboard.':'Select the JSON text and copy it manually.',ok?'good':'warn');}
+}
+document.querySelectorAll('[data-field]').forEach(function(el){el.addEventListener('input',function(){config[el.dataset.field]=el.value;output();});});
+$('active-theme').addEventListener('change',function(){if(!config.theme.presets[this.value])return;config.theme.active=this.value;renderTheme();output();status('Active theme set to '+this.value+'. Export source.json to apply it.','good');});
+document.querySelectorAll('[data-theme-field]').forEach(function(el){const fn=function(){preset()[el.dataset.themeField]=el.value;output();};el.addEventListener('input',fn);el.addEventListener('change',fn);});
+$('models-list').addEventListener('input',function(ev){
+ const el=ev.target.closest('[data-mf]');if(!el)return;const i=Number(el.dataset.mi),f=el.dataset.mf;let v=el.value;
+ if(f==='enabled')v=el.checked;if(f==='category')v=v===''?null:v;if(f==='targetSize')v=Number(v)||8;
+ config.models[i][f]=v;if(f==='enabled')renderModels();output();
+});
+$('models-list').addEventListener('change',function(ev){
+ const el=ev.target.closest('[data-mf]');if(!el)return;const i=Number(el.dataset.mi),f=el.dataset.mf;let v=el.value;
+ if(f==='enabled')v=el.checked;if(f==='category')v=v===''?null:v;if(f==='targetSize')v=Number(v)||8;
+ config.models[i][f]=v;if(['enabled','category','id'].includes(f))renderModels();output();
+});
+$('models-list').addEventListener('click',function(ev){const b=ev.target.closest('[data-remove]');if(!b)return;config.models.splice(Number(b.dataset.remove),1);renderModels();output();});
+$('add-model').addEventListener('click',function(){const ids=config.models.map(function(m){return String(m.id||'');});let n=config.models.length+1;while(ids.includes('model-'+n))n++;
+ config.models.push({id:'model-'+n,category:null,enabled:false,url:'./models/model-'+n+'.glb',targetSize:8});renderModels();output();status('Added a disabled model. New categories need a matching scene slot in index.html.','warn');});
+document.querySelectorAll('[data-env-field]').forEach(function(el){const fn=function(){const f=el.dataset.envField;config.environment[f]=f==='enabled'?el.checked:(f==='url'?el.value:(Number(el.value)||(f==='targetWidth'?270:0)));output();};el.addEventListener('input',fn);el.addEventListener('change',fn);});
+document.querySelectorAll('[data-position-index]').forEach(function(el){const fn=function(){config.environment.position[Number(el.dataset.positionIndex)]=Number(el.value)||0;output();};el.addEventListener('input',fn);el.addEventListener('change',fn);});
+$('load-site').addEventListener('click',loadSiteConfig);
+$('import-file').addEventListener('change',function(ev){const file=ev.target.files&&ev.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=function(){try{setConfig(JSON.parse(String(reader.result||'')),'Imported '+file.name+'. Edit fields and download when ready.');}catch(e){status('Import failed: '+e.message+'. Previous configuration is unchanged.','bad');}ev.target.value='';};reader.onerror=function(){status('Could not read that file.','bad');};reader.readAsText(file);});
+$('download-json').addEventListener('click',download);$('copy-json').addEventListener('click',copy);
+$('reset-sample').addEventListener('click',function(){if(window.confirm('Reset the editor to the starter sample? Unsaved changes will be discarded.'))setConfig(DEFAULT_CONFIG,'Starter configuration restored. Download it to save a copy.');});
+function setConfig(raw,message){config=normalize(raw);renderAll();status(message||'Configuration loaded.','good');}
+renderAll();loadSiteConfig();
+})();
+</script>
+</body>
+</html>
