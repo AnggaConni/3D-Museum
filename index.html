@@ -310,6 +310,7 @@
                 config.sheetUrl = normalizePublishedSheetUrl(rawSheetUrl);
                 config.sourceName = sourceConfig.sourceName || 'Google Sheets';
                 config.models = Array.isArray(sourceConfig.models) ? sourceConfig.models : [];
+                config.environment = sourceConfig.environment || null;
 
                 const sourceLink = document.getElementById('sheet-source-url');
                 if (sourceLink) sourceLink.textContent = config.sourceName + ' (published CSV)';
@@ -777,23 +778,52 @@
             ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true;
             scene.add(ground);
 
-            const buildMat = new THREE.MeshStandardMaterial({ color: 0x1e293b });
-            const windowTex = createWindowTexture();
-            const winMat = new THREE.MeshBasicMaterial({ map: windowTex });
+            // Load a configurable GLB environment around the three category displays.
+            // Do not add the environment to objectsToIntersect: its internal mesh names must not trigger tooltips.
+            const loader = new THREE.GLTFLoader();
+            const environmentConfig = config.environment || {};
+            if (environmentConfig.enabled !== false && environmentConfig.url) {
+                loader.load(
+                    environmentConfig.url,
+                    gltf => {
+                        if (state.scene !== 'MAP') return;
+                        const environment = gltf.scene;
+                        environment.rotation.y = THREE.MathUtils.degToRad(Number(environmentConfig.rotationY) || 0);
+                        environment.updateMatrixWorld(true);
 
-            // Original generated city skyline remains unchanged until the environment phase.
-            for (let i = 0; i < 300; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const radius = 60 + Math.random() * 60;
-                const bx = Math.cos(angle) * radius;
-                const bz = Math.sin(angle) * radius;
-                const height = 4 + Math.random() * 12;
-                const width = 1.5 + Math.random() * 2.5;
-                const buildGeo = new THREE.BoxGeometry(width, height, width);
-                const building = new THREE.Mesh(buildGeo, [winMat, winMat, buildMat, buildMat, winMat, winMat]);
-                building.position.set(bx, height / 2, bz);
-                building.lookAt(0, height / 2, 0);
-                scene.add(building);
+                        const originalBox = new THREE.Box3().setFromObject(environment);
+                        const originalSize = originalBox.getSize(new THREE.Vector3());
+                        const horizontalSize = Math.max(originalSize.x, originalSize.z);
+                        if (!Number.isFinite(horizontalSize) || horizontalSize <= 0) {
+                            console.error('[ENVIRONMENT] Invalid model bounds:', environmentConfig.url);
+                            return;
+                        }
+
+                        // Normalize the horizontal footprint while preserving the model's proportions.
+                        const targetWidth = Number(environmentConfig.targetWidth) || 120;
+                        environment.scale.setScalar(targetWidth / horizontalSize);
+                        environment.updateMatrixWorld(true);
+
+                        const fittedBox = new THREE.Box3().setFromObject(environment);
+                        const fittedCenter = fittedBox.getCenter(new THREE.Vector3());
+                        const position = Array.isArray(environmentConfig.position) ? environmentConfig.position : [0, 0, 0];
+                        environment.position.x += (Number(position[0]) || 0) - fittedCenter.x;
+                        environment.position.y += (Number(position[1]) || 0) - fittedBox.min.y;
+                        environment.position.z += (Number(position[2]) || 0) - fittedCenter.z;
+
+                        environment.traverse(child => {
+                            if (child.isMesh) {
+                                child.castShadow = true;
+                                child.receiveShadow = true;
+                            }
+                        });
+
+                        scene.add(environment);
+                        console.info('[ENVIRONMENT] Loaded:', environmentConfig.url, 'target width:', targetWidth);
+                    },
+                    undefined,
+                    error => console.error('[ENVIRONMENT] Failed to load:', environmentConfig.url, error)
+                );
             }
 
             // Use only the three categories already present in the current Google Sheets data.
@@ -803,8 +833,6 @@
                 { id: 'ancient_craft', x: 0, label: 'Ancient Craft Gallery', desc: 'Traditional Cultural Heritage', platformTop: 0.5, platform: 'stone', delay: 1 },
                 { id: 'museum', x: 14, label: 'General Museum', desc: 'Artifacts Gallery', platformTop: 0.2, platform: 'museum', delay: 2 }
             ];
-
-            const loader = new THREE.GLTFLoader();
 
             categorySlots.forEach(slot => {
                 const modelConfig = config.models.find(item => item && item.category === slot.id);
@@ -1047,8 +1075,83 @@
         function createNavigationPoint(x, y, z, direction, targetIndex) { const navGeo = new THREE.CylinderGeometry(2, 2, 0.1, 32); const navMat = new THREE.MeshBasicMaterial({ color: 0x10b981, transparent: true, opacity: 0.5 }); const nav = new THREE.Mesh(navGeo, navMat); nav.position.set(x, 0.1, z); nav.userData = { type: 'nav', direction: direction, targetIndex: targetIndex, name: direction === 'next' ? 'NEXT SECTOR' : 'PREVIOUS SECTOR' }; const arrowGeo = new THREE.ConeGeometry(0.5, 1, 4); const arrowMat = new THREE.MeshBasicMaterial({ color: 0x10b981 }); const arrow = new THREE.Mesh(arrowGeo, arrowMat); arrow.position.set(x, 1.5, z); arrow.rotation.x = Math.PI; gsap.to(arrow.position, { y: 1.2, duration: 0.8, repeat: -1, yoyo: true }); gsap.to(nav.scale, { x: 1.2, z: 1.2, duration: 1, yoyo: true, repeat: -1 }); objectsToIntersect.push(nav); scene.add(nav); scene.add(arrow); }
         function clearScene() { objectsToIntersect = []; activeFishes = []; for(let i = scene.children.length - 1; i >= 0; i--) { const obj = scene.children[i]; if(obj.type === 'Mesh' || obj.type === 'Group' || obj.type === 'GridHelper' || obj.type === 'SpotLight') scene.remove(obj); } }
         function addFloatingAnimation(group, delay) { gsap.to(group.position, { y: 0.5, duration: 2, repeat: -1, yoyo: true, delay: delay, ease: "sine.inOut" }); gsap.to(group.rotation, { y: 0.1, duration: 4, repeat: -1, yoyo: true, delay: delay, ease: "sine.inOut" }); }
-        function onMouseMove(event) { mouse.x = (event.clientX / window.innerWidth) * 2 - 1; mouse.y = -(event.clientY / window.innerHeight) * 2 + 1; raycaster.setFromCamera(mouse, camera); const intersects = raycaster.intersectObjects(objectsToIntersect, true); const tooltip = document.getElementById('tooltip'); let found = false; if (intersects.length > 0) { let target = intersects[0].object; while(!target.userData.name && !target.userData.type && target.parent) target = target.parent; if (target.userData.name) { found = true; document.body.style.cursor = 'pointer'; tooltip.style.display = 'block'; tooltip.style.left = (event.clientX + 15) + 'px'; tooltip.style.top = (event.clientY + 15) + 'px'; tooltip.innerHTML = target.userData.type === 'category' ? `<strong>${target.userData.name}</strong><br><span style="color:#94a3b8; font-size:10px">${target.userData.desc}</span>` : target.userData.name; } else if (target.userData.type === 'fish') document.body.style.cursor = 'crosshair'; } if (!found) { document.body.style.cursor = 'default'; tooltip.style.display = 'none'; } }
-        function onMouseClick(event) { if(state.scene === 'TITLE') return; raycaster.setFromCamera(mouse, camera); const intersects = raycaster.intersectObjects(objectsToIntersect, true); if (intersects.length > 0) { let target = intersects[0].object; if(target.userData.type === 'fish') { jumpFish(target); return; } while(!target.userData.type && target.parent) target = target.parent; playClickSound(); if (target.userData.type === 'category') enterRoom(target.userData.value, 0); else if (target.userData.type === 'artifact') showArtifactDetails(target.userData.data); else if (target.userData.type === 'nav') enterRoom(state.currentCategory, target.userData.targetIndex); } }
+        function resolveInteractiveTarget(object) {
+            // Prefer a category group over arbitrary node/mesh names imported from GLB.
+            let current = object;
+            let categoryRoot = null;
+            let nearestInteractive = null;
+            while (current) {
+                const type = current.userData && current.userData.type;
+                if (type === 'category') categoryRoot = current;
+                if (!nearestInteractive && ['artifact', 'nav', 'fish'].includes(type)) nearestInteractive = current;
+                current = current.parent;
+            }
+            return categoryRoot || nearestInteractive || object;
+        }
+
+        function onMouseMove(event) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objectsToIntersect, true);
+            const tooltip = document.getElementById('tooltip');
+            let found = false;
+
+            if (intersects.length > 0) {
+                const target = resolveInteractiveTarget(intersects[0].object);
+                const type = target.userData && target.userData.type;
+
+                if (type === 'category') {
+                    found = true;
+                    document.body.style.cursor = 'pointer';
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (event.clientX + 15) + 'px';
+                    tooltip.style.top = (event.clientY + 15) + 'px';
+                    tooltip.innerHTML = '<strong>' + target.userData.name + '</strong><br><span style="color:#94a3b8;font-size:10px">' + (target.userData.desc || '') + '</span>';
+                } else if (type === 'artifact') {
+                    found = true;
+                    document.body.style.cursor = 'pointer';
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (event.clientX + 15) + 'px';
+                    tooltip.style.top = (event.clientY + 15) + 'px';
+                    tooltip.textContent = target.userData.name || (target.userData.data && target.userData.data.title) || 'Artifact';
+                } else if (type === 'nav') {
+                    found = true;
+                    document.body.style.cursor = 'pointer';
+                    tooltip.style.display = 'block';
+                    tooltip.style.left = (event.clientX + 15) + 'px';
+                    tooltip.style.top = (event.clientY + 15) + 'px';
+                    tooltip.textContent = target.userData.name || 'Navigation';
+                } else if (type === 'fish') {
+                    document.body.style.cursor = 'crosshair';
+                }
+            }
+
+            if (!found) {
+                document.body.style.cursor = 'default';
+                tooltip.style.display = 'none';
+            }
+        }
+
+        function onMouseClick(event) {
+            if (state.scene === 'TITLE') return;
+            raycaster.setFromCamera(mouse, camera);
+            const intersects = raycaster.intersectObjects(objectsToIntersect, true);
+            if (!intersects.length) return;
+
+            const target = resolveInteractiveTarget(intersects[0].object);
+            const type = target.userData && target.userData.type;
+            if (type === 'fish') {
+                jumpFish(target);
+                return;
+            }
+
+            playClickSound();
+            if (type === 'category') enterRoom(target.userData.value, 0);
+            else if (type === 'artifact') showArtifactDetails(target.userData.data);
+            else if (type === 'nav') enterRoom(state.currentCategory, target.userData.targetIndex);
+        }
+
         function enterRoom(category, index) { 
             if(state.currentCategory !== category) { 
                 state.currentCategory = category; 
